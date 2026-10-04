@@ -10,33 +10,162 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as JoinRouteImport } from './routes/join'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as PortalRouteImport } from './routes/portal'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as BookIdRouteImport } from './routes/book.$id'
+import { Route as ConfirmationCodeRouteImport } from './routes/confirmation.$code'
+import { Route as PortalIndexRouteImport } from './routes/portal.index'
+import { Route as PortalAvailabilityRouteImport } from './routes/portal.availability'
+import { Route as PortalDocumentsRouteImport } from './routes/portal.documents'
+import { Route as ProsIdRouteImport } from './routes/pros.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const JoinRoute = JoinRouteImport.update({
+  id: '/join',
+  path: '/join',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalRoute = PortalRouteImport.update({
+  id: '/portal',
+  path: '/portal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookIdRoute = BookIdRouteImport.update({
+  id: '/book/$id',
+  path: '/book/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfirmationCodeRoute = ConfirmationCodeRouteImport.update({
+  id: '/confirmation/$code',
+  path: '/confirmation/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalIndexRoute = PortalIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalAvailabilityRoute = PortalAvailabilityRouteImport.update({
+  id: '/availability',
+  path: '/availability',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalDocumentsRoute = PortalDocumentsRouteImport.update({
+  id: '/documents',
+  path: '/documents',
+  getParentRoute: () => PortalRoute,
+} as any)
+const ProsIdRoute = ProsIdRouteImport.update({
+  id: '/pros/$id',
+  path: '/pros/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/join': typeof JoinRoute
+  '/login': typeof LoginRoute
+  '/portal': typeof PortalRouteWithChildren
+  '/search': typeof SearchRoute
+  '/book/$id': typeof BookIdRoute
+  '/confirmation/$code': typeof ConfirmationCodeRoute
+  '/portal/availability': typeof PortalAvailabilityRoute
+  '/portal/documents': typeof PortalDocumentsRoute
+  '/pros/$id': typeof ProsIdRoute
+  '/portal/': typeof PortalIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/join': typeof JoinRoute
+  '/login': typeof LoginRoute
+  '/search': typeof SearchRoute
+  '/book/$id': typeof BookIdRoute
+  '/confirmation/$code': typeof ConfirmationCodeRoute
+  '/portal/availability': typeof PortalAvailabilityRoute
+  '/portal/documents': typeof PortalDocumentsRoute
+  '/pros/$id': typeof ProsIdRoute
+  '/portal': typeof PortalIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/join': typeof JoinRoute
+  '/login': typeof LoginRoute
+  '/portal': typeof PortalRouteWithChildren
+  '/search': typeof SearchRoute
+  '/book/$id': typeof BookIdRoute
+  '/confirmation/$code': typeof ConfirmationCodeRoute
+  '/portal/availability': typeof PortalAvailabilityRoute
+  '/portal/documents': typeof PortalDocumentsRoute
+  '/pros/$id': typeof ProsIdRoute
+  '/portal/': typeof PortalIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/join'
+    | '/login'
+    | '/portal'
+    | '/search'
+    | '/book/$id'
+    | '/confirmation/$code'
+    | '/portal/availability'
+    | '/portal/documents'
+    | '/pros/$id'
+    | '/portal/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/join'
+    | '/login'
+    | '/search'
+    | '/book/$id'
+    | '/confirmation/$code'
+    | '/portal/availability'
+    | '/portal/documents'
+    | '/pros/$id'
+    | '/portal'
+  id:
+    | '__root__'
+    | '/'
+    | '/join'
+    | '/login'
+    | '/portal'
+    | '/search'
+    | '/book/$id'
+    | '/confirmation/$code'
+    | '/portal/availability'
+    | '/portal/documents'
+    | '/pros/$id'
+    | '/portal/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  JoinRoute: typeof JoinRoute
+  LoginRoute: typeof LoginRoute
+  PortalRoute: typeof PortalRouteWithChildren
+  SearchRoute: typeof SearchRoute
+  BookIdRoute: typeof BookIdRoute
+  ConfirmationCodeRoute: typeof ConfirmationCodeRoute
+  ProsIdRoute: typeof ProsIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +177,103 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/join': {
+      id: '/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof JoinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal': {
+      id: '/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof PortalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/book/$id': {
+      id: '/book/$id'
+      path: '/book/$id'
+      fullPath: '/book/$id'
+      preLoaderRoute: typeof BookIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/confirmation/$code': {
+      id: '/confirmation/$code'
+      path: '/confirmation/$code'
+      fullPath: '/confirmation/$code'
+      preLoaderRoute: typeof ConfirmationCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal/': {
+      id: '/portal/'
+      path: '/'
+      fullPath: '/portal/'
+      preLoaderRoute: typeof PortalIndexRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/availability': {
+      id: '/portal/availability'
+      path: '/availability'
+      fullPath: '/portal/availability'
+      preLoaderRoute: typeof PortalAvailabilityRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/documents': {
+      id: '/portal/documents'
+      path: '/documents'
+      fullPath: '/portal/documents'
+      preLoaderRoute: typeof PortalDocumentsRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/pros/$id': {
+      id: '/pros/$id'
+      path: '/pros/$id'
+      fullPath: '/pros/$id'
+      preLoaderRoute: typeof ProsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface PortalRouteChildren {
+  PortalAvailabilityRoute: typeof PortalAvailabilityRoute
+  PortalDocumentsRoute: typeof PortalDocumentsRoute
+  PortalIndexRoute: typeof PortalIndexRoute
+}
+
+const PortalRouteChildren: PortalRouteChildren = {
+  PortalAvailabilityRoute: PortalAvailabilityRoute,
+  PortalDocumentsRoute: PortalDocumentsRoute,
+  PortalIndexRoute: PortalIndexRoute,
+}
+
+const PortalRouteWithChildren =
+  PortalRoute._addFileChildren(PortalRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  JoinRoute: JoinRoute,
+  LoginRoute: LoginRoute,
+  PortalRoute: PortalRouteWithChildren,
+  SearchRoute: SearchRoute,
+  BookIdRoute: BookIdRoute,
+  ConfirmationCodeRoute: ConfirmationCodeRoute,
+  ProsIdRoute: ProsIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

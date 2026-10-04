@@ -1,24 +1,29 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { useStore } from "@/lib/store";
-import { CITIES, PROFESSIONS, PROS } from "@/lib/data";
+import { SearchX } from "lucide-react";
+import { CITIES, PROFESSIONS, PROS, cityMatches, professionLabel } from "@/lib/data";
 import { ProCard } from "@/components/site";
 
 type S = { profession?: string | undefined; city?: string | undefined; date?: string | undefined; hours?: number | undefined };
 
+const str = (v: unknown) => (v === undefined || v === null || v === "" ? undefined : String(v));
+
 export const Route = createFileRoute("/search")({
-  validateSearch: (s: Record<string, unknown>): S => ({
-    profession: s['profession'] ? String(s['profession']) : undefined,
-    city: s['city'] ? String(s['city']) : undefined,
-    date: s['date'] ? String(s['date']) : undefined,
-    hours: s['hours'] ? Number(s['hours']) : undefined,
-  }),
+  validateSearch: (s: Record<string, unknown>): S => {
+    const h = Number(s["hours"]);
+    return {
+      profession: str(s["profession"]),
+      city: str(s["city"]),
+      date: str(s["date"]),
+      hours: Number.isFinite(h) && h > 0 ? h : undefined,
+    };
+  },
   head: () => ({
     meta: [
-      { title: "Find event pros — Prozo" },
-      { name: "description", content: "Browse verified lifeguards, security guards, medics and photographers near you." },
-      { property: "og:title", content: "Find event pros — Prozo" },
-      { property: "og:description", content: "Browse verified event professionals and book instantly." },
+      { title: "חיפוש מקצוענים לאירוע — Prozo" },
+      { name: "description", content: "מצילים, מאבטחים, חובשים וצלמי אירועים מאומתים באזורכם." },
+      { property: "og:title", content: "חיפוש מקצוענים לאירוע — Prozo" },
+      { property: "og:description", content: "השוו והזמינו אנשי מקצוע מוסמכים לאירוע שלכם." },
     ],
   }),
   component: SearchPage,
@@ -27,41 +32,52 @@ export const Route = createFileRoute("/search")({
 function SearchPage() {
   const s = Route.useSearch();
   const nav = useNavigate({ from: "/search" });
-  const { lang } = useStore();
   const [sort, setSort] = useState("rating");
 
   const results = useMemo(() => {
-    const r = PROS.filter(
-      (p) => (!s['profession'] || p.profession === s['profession']) && (!s['city'] || p.city.toLowerCase().includes(s.city.toLowerCase())),
-    );
+    const r = PROS.filter((p) => (!s.profession || p.profession === s.profession) && cityMatches(p.city, s.city));
     return r.sort((a, b) => (sort === "rating" ? b.rating - a.rating : sort === "low" ? a.rate - b.rate : b.rate - a.rate));
   }, [s.profession, s.city, sort]);
 
+  const reset = () => nav({ search: { date: s.date, hours: s.hours } });
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
-      <h1 className="text-3xl font-bold">{results.length} pros available</h1>
+      <h1 className="text-3xl font-bold">
+        {results.length > 0 ? `${results.length} מקצוענים זמינים` : "לא נמצאו מקצוענים"}
+      </h1>
       <p className="mt-1 text-muted-foreground">
-        {s['date'] ? `For ${s.date}` : "Any date"} · {s['hours'] ?? 4} hours
+        {s.profession ? professionLabel(s.profession) : "כל המקצועות"}
+        {s.city ? ` · ${s.city}` : ""} · {s.date ? `בתאריך ${s.date}` : "כל תאריך"} · {s.hours ?? 4} שעות
       </p>
       <div className="mt-6 flex flex-wrap gap-3">
-        <select className="field w-auto" value={s['profession'] ?? ""} onChange={(e) => nav({ search: (p) => ({ ...p, profession: e.target.value || undefined }) })}>
-          <option value="">All professions</option>
-          {PROFESSIONS.map((p) => <option key={p.id} value={p.id}>{p[lang]}</option>)}
+        <select className="field w-auto" value={s.profession ?? ""} onChange={(e) => nav({ search: (p) => ({ ...p, profession: e.target.value || undefined }) })}>
+          <option value="">כל המקצועות</option>
+          {PROFESSIONS.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
         </select>
-        <select className="field w-auto" value={s['city'] ?? ""} onChange={(e) => nav({ search: (p) => ({ ...p, city: e.target.value || undefined }) })}>
-          <option value="">All cities</option>
-          {CITIES.map((c) => <option key={c.en} value={c.en}>{c[lang]}</option>)}
+        <select className="field w-auto" value={CITIES.some((c) => c.he === s.city) ? s.city : ""} onChange={(e) => nav({ search: (p) => ({ ...p, city: e.target.value || undefined }) })}>
+          <option value="">כל הערים</option>
+          {CITIES.map((c) => <option key={c.he} value={c.he}>{c.he}</option>)}
         </select>
         <select className="field w-auto" value={sort} onChange={(e) => setSort(e.target.value)}>
-          <option value="rating">Top rated</option>
-          <option value="low">Price: low to high</option>
-          <option value="high">Price: high to low</option>
+          <option value="rating">דירוג גבוה</option>
+          <option value="low">מחיר: מהנמוך לגבוה</option>
+          <option value="high">מחיר: מהגבוה לנמוך</option>
         </select>
       </div>
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {results.map((p) => <ProCard key={p.id} pro={p} />)}
-      </div>
-      {results.length === 0 && <p className="mt-16 text-center text-muted-foreground">No pros match these filters yet.</p>}
+
+      {results.length > 0 ? (
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {results.map((p) => <ProCard key={p.id} pro={p} />)}
+        </div>
+      ) : (
+        <div className="card-surface mx-auto mt-12 max-w-md p-10 text-center">
+          <SearchX className="mx-auto h-10 w-10 text-muted-foreground" />
+          <h2 className="mt-4 text-xl font-semibold">אופס, אין התאמות כרגע</h2>
+          <p className="mt-2 text-sm text-muted-foreground">לא מצאנו מקצוענים שמתאימים לסינון שבחרתם. נסו עיר אחרת או אפסו את המסננים.</p>
+          <button className="btn-primary mt-6" onClick={reset}>איפוס מסננים</button>
+        </div>
+      )}
     </div>
   );
 }

@@ -34,7 +34,7 @@ function Availability() {
         </div>
         <div className="flex items-center gap-2">
           <button className="btn-ghost p-2" onClick={() => setWeek(week - 1)} aria-label="Previous week"><ChevronLeft className="h-4 w-4 rtl:rotate-180" /></button>
-          <span className="min-w-36 text-center text-sm">{format(days[0], "MMM d")} – {format(days[6], "MMM d")}</span>
+          <span className="min-w-36 text-center text-sm">{format(days[0]!, "MMM d")} – {format(days[6]!, "MMM d")}</span>
           <button className="btn-ghost p-2" onClick={() => setWeek(week + 1)} aria-label="Next week"><ChevronRight className="h-4 w-4 rtl:rotate-180" /></button>
         </div>
       </div>

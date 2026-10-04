@@ -25,7 +25,7 @@ function Join() {
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (f.password.length < 6) return toast.error("Password must be at least 6 characters");
+    if (f.password.length < 6) { toast.error("Password must be at least 6 characters"); return; }
     register({ ...f, docs: { id: "missing", cert: "missing", firstaid: "missing" }, availability: {} });
     toast.success("Welcome to Prozo! Upload your documents to go live.");
     nav({ to: "/portal/documents" });

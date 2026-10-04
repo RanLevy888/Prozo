@@ -4,7 +4,7 @@ import { useStore } from "@/lib/store";
 import { CITIES, PROFESSIONS, PROS } from "@/lib/data";
 import { ProCard } from "@/components/site";
 
-type S = { profession?: string | undefined; city?: string | undefined; date?: string | undefined; hours?: number };
+type S = { profession?: string | undefined; city?: string | undefined; date?: string | undefined; hours?: number | undefined };
 
 export const Route = createFileRoute("/search")({
   validateSearch: (s: Record<string, unknown>): S => ({

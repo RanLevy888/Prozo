@@ -4,7 +4,7 @@ import { Lock, CreditCard, Check } from "lucide-react";
 import { PROS, calcPrice, hoursBetween, professionLabel } from "@/lib/data";
 import { useStore } from "@/lib/store";
 
-type S = { date?: string | undefined; start?: string | undefined; end?: string };
+type S = { date?: string | undefined; start?: string | undefined; end?: string | undefined };
 
 export const Route = createFileRoute("/book/$id")({
   validateSearch: (s: Record<string, unknown>): S => ({

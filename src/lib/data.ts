@@ -79,7 +79,7 @@ export const PROS: Pro[] = raw.map(([name, nameHe, profession, cityIdx, rate, im
   name,
   nameHe,
   profession,
-  city: CITIES[cityIdx].en,
+  city: CITIES[cityIdx]!.en,
   rate,
   minHours: profession === "photographer" ? 3 : 4,
   rating: Math.round((4.6 + ((i * 7) % 5) / 12) * 10) / 10,
@@ -93,7 +93,7 @@ export const PROS: Pro[] = raw.map(([name, nameHe, profession, cityIdx, rate, im
       ? Array.from({ length: 6 }, (_, g) => `https://picsum.photos/seed/prozo-${i}-${g}/600/450`)
       : Array.from({ length: 3 }, (_, g) => `https://picsum.photos/seed/prozo-${profession}-${i}-${g}/600/450`),
   reviews: [0, 1, 2].map((r) => ({
-    ...reviewPool[(i + r) % reviewPool.length],
+    ...reviewPool[(i + r) % reviewPool.length]!,
     rating: r === 2 ? 4 : 5,
     date: `2026-0${(r % 8) + 6}-1${r}`,
   })),
@@ -111,8 +111,8 @@ export const calcPrice = (rate: number, hours: number) => {
 };
 
 export const hoursBetween = (start: string, end: string) => {
-  const [sh, sm] = start.split(":").map(Number);
-  const [eh, em] = end.split(":").map(Number);
+  const [sh = 0, sm = 0] = start.split(":").map(Number);
+  const [eh = 0, em = 0] = end.split(":").map(Number);
   let d = eh * 60 + em - (sh * 60 + sm);
   if (d <= 0) d += 24 * 60;
   return Math.round((d / 60) * 2) / 2;

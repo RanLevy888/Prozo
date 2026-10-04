@@ -4,13 +4,13 @@ import { Lock, CreditCard, Check } from "lucide-react";
 import { PROS, calcPrice, hoursBetween, professionLabel } from "@/lib/data";
 import { useStore } from "@/lib/store";
 
-type S = { date?: string; start?: string; end?: string };
+type S = { date?: string | undefined; start?: string | undefined; end?: string };
 
 export const Route = createFileRoute("/book/$id")({
   validateSearch: (s: Record<string, unknown>): S => ({
-    date: s.date ? String(s.date) : undefined,
-    start: s.start ? String(s.start) : undefined,
-    end: s.end ? String(s.end) : undefined,
+    date: s['date'] ? String(s['date']) : undefined,
+    start: s['start'] ? String(s['start']) : undefined,
+    end: s['end'] ? String(s['end']) : undefined,
   }),
   loader: ({ params }) => {
     const pro = PROS.find((p) => p.id === params.id);
@@ -38,7 +38,7 @@ function BookPage() {
   const nav = useNavigate();
   const [step, setStep] = useState(0);
   const [f, setF] = useState({
-    location: "", date: s.date ?? "", start: s.start ?? "18:00", end: s.end ?? "23:00",
+    location: "", date: s['date'] ?? "", start: s['start'] ?? "18:00", end: s['end'] ?? "23:00",
     name: "", phone: "", email: "", card: "", exp: "", cvc: "", holder: "",
   });
   const [processing, setProcessing] = useState(false);

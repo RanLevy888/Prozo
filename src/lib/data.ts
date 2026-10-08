@@ -1,10 +1,14 @@
-export type Profession = "lifeguard" | "security" | "medic" | "photographer";
+export type Profession = "lifeguard" | "security" | "medic" | "photographer" | "electrician" | "plumber" | "cleaning" | "waiter";
 
 export const PROFESSIONS: { id: Profession; label: string }[] = [
   { id: "lifeguard", label: "מציל בריכה" },
   { id: "security", label: "מאבטח / סלקטור" },
   { id: "medic", label: "חובש / עזרה ראשונה" },
   { id: "photographer", label: "צלם אירועים" },
+  { id: "electrician", label: "חשמלאי מוסמך" },
+  { id: "plumber", label: "אינסטלטור" },
+  { id: "cleaning", label: "ניקיון ותחזוקה" },
+  { id: "waiter", label: "מלצר / ברמן" },
 ];
 
 export const CITIES = [
@@ -38,6 +42,10 @@ const certs: Record<Profession, string[]> = {
   security: ["רישיון מאבטח – המשרד לביטחון לאומי", "הסמכה לניהול קהל", "עזרה ראשונה בסיסית"],
   medic: ["חובש מוסמך מד״א", "הסמכת BLS / ACLS", "הכשרה לאירוע רב־נפגעים"],
   photographer: ["תעודת צילום מקצועי", "רישיון מפעיל רחפן – רת״א", "הסמכת Adobe מקצועית"],
+  electrician: ["רישיון חשמלאי מוסמך – משרד העבודה", "הסמכה לעבודה בגובה", "ביטוח צד ג׳ בתוקף"],
+  plumber: ["תעודת אינסטלטור מוסמך", "הסמכה למערכות גז", "ביטוח צד ג׳ בתוקף"],
+  cleaning: ["הכשרה בחומרי ניקוי מקצועיים", "בדיקת רקע תקינה", "ביטוח צד ג׳ בתוקף"],
+  waiter: ["קורס ברמנות מקצועי", "הכשרה בתברואה ובטיחות מזון", "בדיקת רקע תקינה"],
 };
 
 const bios: Record<Profession, string> = {
@@ -45,6 +53,10 @@ const bios: Record<Profession, string> = {
   security: "לוחם/ת קרבי לשעבר ומאבטח/ת בעל/ת רישיון. מתמחה בבקרת כניסה, אבטחת אישים וניהול זרימת קהל באירועים פרטיים ועסקיים.",
   medic: "מגיש/ה ראשון/ה מנוסה המעניק/ה כיסוי רפואי באירועים, פסטיבלים, חתונות ואירועי ספורט. מגיע/ה עם ציוד טראומה ודפיברילטור מלא.",
   photographer: "צלם/ת אירועים שתופס/ת רגעים אותנטיים וקולנועיים בחתונות, בר/ת מצוות והשקות מותג. גלריה ערוכה תוך 72 שעות.",
+  electrician: "חשמלאי/ת מוסמך/ת לתיקונים, התקנות ובדיקות בבתים, משרדים ואירועים. עבודה נקייה, בטוחה ובזמן.",
+  plumber: "אינסטלטור/ית מנוסה לתיקון נזילות, פתיחת סתימות והתקנות. מגיע/ה מהר ועם כל הציוד הדרוש.",
+  cleaning: "צוות ניקיון מקצועי לבתים, משרדים ולפני ואחרי אירועים. יסודיות, דיסקרטיות ועמידה בזמנים.",
+  waiter: "מלצר/ית וברמן/ית עם ניסיון באירועים פרטיים ועסקיים. שירות אדיב, מהיר ומקצועי.",
 };
 
 const raw: [string, Profession, number, number, string][] = [
@@ -64,13 +76,21 @@ const raw: [string, Profession, number, number, string][] = [
   ["ליאור הלוי", "photographer", 1, 280, "men/67"],
   ["גל אוחנה", "photographer", 4, 300, "women/12"],
   ["אריאל ששון", "photographer", 3, 260, "men/36"],
+  ["משה אלון", "electrician", 0, 180, "men/14"],
+  ["אלון רביבו", "electrician", 2, 170, "men/61"],
+  ["יוסף נחום", "plumber", 4, 160, "men/41"],
+  ["עידו ברק", "plumber", 1, 165, "men/28"],
+  ["סיגל עמר", "cleaning", 3, 90, "women/50"],
+  ["אורית חדד", "cleaning", 0, 95, "women/57"],
+  ["נטע שלום", "waiter", 1, 85, "women/29"],
+  ["תום ויס", "waiter", 2, 80, "men/19"],
 ];
 
 const reviewPool = [
-  { author: "דנה ר.", text: "מקצועי ברמה הכי גבוהה ודייקן. האורחים הרגישו בטוחים לאורך כל הערב." },
+  { author: "דנה ר.", text: "מקצועי ברמה הכי גבוהה ודייקן. עבודה מעולה מההתחלה ועד הסוף." },
   { author: "יוסי ק.", text: "הזמנתי תוך שתי דקות, הגיע מוקדם ועם גישה מעולה. ממליץ בחום!" },
-  { author: "הילה מ.", text: "בדיוק מה שהיינו צריכים לאירוע. בטוח נזמין שוב." },
-  { author: "עמית ס.", text: "אדיב, דיסקרטי וערני. תקשורת מצוינת לפני האירוע." },
+  { author: "הילה מ.", text: "בדיוק מה שהיינו צריכים. בטוח נזמין שוב." },
+  { author: "עמית ס.", text: "אדיב, דיסקרטי ואמין. תקשורת מצוינת לאורך כל הדרך." },
 ];
 
 export const PROS: Pro[] = raw.map(([name, profession, cityIdx, rate, img], i) => ({
@@ -79,7 +99,7 @@ export const PROS: Pro[] = raw.map(([name, profession, cityIdx, rate, img], i) =
   profession,
   city: CITIES[cityIdx]!.he,
   rate,
-  minHours: profession === "photographer" ? 3 : 4,
+  minHours: profession === "photographer" ? 3 : ["electrician", "plumber"].includes(profession) ? 1 : 4,
   rating: Math.round((4.6 + ((i * 7) % 5) / 12) * 10) / 10,
   reviewsCount: 18 + ((i * 13) % 90),
   avatar: `https://randomuser.me/api/portraits/${img}.jpg`,
@@ -87,7 +107,7 @@ export const PROS: Pro[] = raw.map(([name, profession, cityIdx, rate, img], i) =
   certifications: certs[profession],
   years: 2 + (i % 9),
   gallery:
-    profession === "photographer"
+    ["photographer", "waiter"].includes(profession)
       ? Array.from({ length: 6 }, (_, g) => `https://picsum.photos/seed/prozo-${i}-${g}/600/450`)
       : Array.from({ length: 3 }, (_, g) => `https://picsum.photos/seed/prozo-${profession}-${i}-${g}/600/450`),
   reviews: [0, 1, 2].map((r) => ({

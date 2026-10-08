@@ -1,22 +1,22 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Search, ShieldCheck, Zap, BadgeCheck, LifeBuoy, Shield, HeartPulse, Camera } from "lucide-react";
+import { Search, ShieldCheck, Zap, BadgeCheck, LifeBuoy, Shield, HeartPulse, Camera, Plug, Wrench, Sparkles, GlassWater } from "lucide-react";
 import { CITIES, PROFESSIONS, PROS } from "@/lib/data";
 import { ProCard } from "@/components/site";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Prozo — צוות אירועים מוסמך, מוזמן בדקות" },
-      { name: "description", content: "מצילים, מאבטחים, חובשים וצלמי אירועים מאומתים. הזמנה מהירה ללא הרשמה." },
-      { property: "og:title", content: "Prozo — צוות אירועים מוסמך, מוזמן בדקות" },
-      { property: "og:description", content: "מצילים, מאבטחים, חובשים וצלמים מאומתים. ללא צורך בהרשמה." },
+      { title: "Prozo — אנשי מקצוע מאומתים, מוזמנים בדקות" },
+      { name: "description", content: "מצילים, מאבטחים, חשמלאים, אינסטלטורים, צלמים ועוד — אנשי מקצוע מאומתים. הזמנה מהירה ללא הרשמה." },
+      { property: "og:title", content: "Prozo — אנשי מקצוע מאומתים, מוזמנים בדקות" },
+      { property: "og:description", content: "אנשי מקצוע מאומתים לכל עבודה. ללא צורך בהרשמה." },
     ],
   }),
   component: Index,
 });
 
-const icons = { lifeguard: LifeBuoy, security: Shield, medic: HeartPulse, photographer: Camera };
+const icons = { lifeguard: LifeBuoy, security: Shield, medic: HeartPulse, photographer: Camera, electrician: Plug, plumber: Wrench, cleaning: Sparkles, waiter: GlassWater };
 
 function Index() {
   const nav = useNavigate();
@@ -45,11 +45,11 @@ function Index() {
               <BadgeCheck className="h-3.5 w-3.5 text-primary" /> מאומתים • מוסמכים • מבוטחים
             </span>
             <h1 className="mt-6 text-4xl font-extrabold leading-tight sm:text-6xl">
-              צוות אירועים מוסמך,<br />
-              <span className="bg-gradient-primary bg-clip-text text-transparent">מוזמן בדקות.</span>
+              איש המקצוע הנכון,<br />
+              <span className="bg-gradient-primary bg-clip-text text-transparent">בדיוק כשצריך</span>
             </h1>
             <p className="mx-auto mt-5 max-w-xl text-lg text-muted-foreground">
-              מצילים, מאבטחים, חובשים וצלמים — עם רישיונות ובדיקות רקע. בלי הרשמה, בלי חיכוך.
+              מצילים, מאבטחים, חשמלאים, אינסטלטורים, צלמים ועוד — כולם עם רישיונות ובדיקות רקע. מזמינים בדקות, בלי הרשמה.
             </p>
           </div>
 
@@ -98,7 +98,7 @@ function Index() {
           {[
             { I: ShieldCheck, h: "כל מקצוען עובר אימות", p: "רישיונות, תעודות זהות והסמכות נבדקים ידנית לפני שמישהו עולה לאוויר." },
             { I: Zap, h: "הזמנה בלי חיכוך", p: "לא צריך חשבון. בוחרים מקצוען, ממלאים פרטים וסיימתם — בפחות משתי דקות." },
-            { I: BadgeCheck, h: "תשלום מאובטח בנאמנות", p: "הכרטיס רק מאושר מראש. הכסף מועבר רק אחרי שהמשמרת הסתיימה." },
+            { I: BadgeCheck, h: "תשלום מאובטח בנאמנות", p: "הכרטיס רק מאושר מראש. הכסף מועבר רק אחרי שהעבודה הושלמה." },
           ].map(({ I, h, p }) => (
             <div key={h} className="card-surface p-6">
               <I className="h-6 w-6 text-primary" />

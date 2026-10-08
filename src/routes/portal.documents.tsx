@@ -8,9 +8,9 @@ export const Route = createFileRoute("/portal/documents")({
 });
 
 const DOCS = [
-  { key: "id", title: "Government ID", desc: "Teudat Zehut or passport (both sides)" },
-  { key: "cert", title: "Professional certificate / license", desc: "Lifeguard, security, medic or photography credentials" },
-  { key: "firstaid", title: "First aid refresher", desc: "Valid within the last 24 months" },
+  { key: "id", title: "תעודה מזהה", desc: "תעודת זהות או דרכון (שני הצדדים)" },
+  { key: "cert", title: "תעודה מקצועית / רישיון", desc: "רישיון או הסמכה בתחום שלכם" },
+  { key: "firstaid", title: "רענון עזרה ראשונה", desc: "בתוקף מ-24 החודשים האחרונים" },
 ];
 
 const badge = {
@@ -18,19 +18,19 @@ const badge = {
   pending: "bg-warning/15 text-warning",
   approved: "bg-success/15 text-success",
 };
-const label = { missing: "Not uploaded", pending: "Pending Review", approved: "Approved" };
+const label = { missing: "לא הועלה", pending: "ממתין לבדיקה", approved: "מאושר" };
 
 function Documents() {
   const { account, updateAccount } = useStore();
   if (!account) return null;
   const upload = (key: string) => {
     updateAccount({ docs: { ...account.docs, [key]: "pending" } });
-    toast.success("Uploaded — our team will review within 24h");
+    toast.success("הקובץ הועלה. הצוות שלנו יבדוק אותו תוך 24 שעות");
   };
   return (
     <div>
-      <h1 className="text-2xl font-bold">Document verification</h1>
-      <p className="mt-1 text-sm text-muted-foreground">Clients only see pros whose documents are approved.</p>
+      <h1 className="text-2xl font-bold">אימות מסמכים</h1>
+      <p className="mt-1 text-sm text-muted-foreground">לקוחות רואים רק אנשי מקצוע שהמסמכים שלהם אושרו.</p>
       <div className="mt-6 space-y-3">
         {DOCS.map((d) => {
           const st = account.docs[d.key] ?? "missing";
@@ -43,7 +43,7 @@ function Documents() {
               </div>
               <span className={`rounded-full px-3 py-1 text-xs ${badge[st]}`}>{label[st]}</span>
               <label className="btn-ghost cursor-pointer py-1.5 text-sm">
-                <Upload className="h-4 w-4" />{st === "missing" ? "Upload" : "Replace"}
+                <Upload className="h-4 w-4" />{st === "missing" ? "העלאה" : "החלפה"}
                 <input type="file" className="hidden" accept="image/*,.pdf" onChange={() => upload(d.key)} />
               </label>
             </div>

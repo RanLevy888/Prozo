@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { addDays, format, startOfWeek } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { he } from "date-fns/locale";
 import { useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/portal/availability")({
@@ -29,13 +30,13 @@ function Availability() {
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Availability</h1>
-          <p className="text-sm text-muted-foreground">Tap slots to toggle. Blue = available for bookings.</p>
+          <h1 className="text-2xl font-bold">זמינות</h1>
+          <p className="text-sm text-muted-foreground">לחצו על משבצת כדי לשנות. כחול = פנוי להזמנות.</p>
         </div>
         <div className="flex items-center gap-2">
-          <button className="btn-ghost p-2" onClick={() => setWeek(week - 1)} aria-label="Previous week"><ChevronLeft className="h-4 w-4 rtl:rotate-180" /></button>
-          <span className="min-w-36 text-center text-sm">{format(days[0]!, "MMM d")} – {format(days[6]!, "MMM d")}</span>
-          <button className="btn-ghost p-2" onClick={() => setWeek(week + 1)} aria-label="Next week"><ChevronRight className="h-4 w-4 rtl:rotate-180" /></button>
+          <button className="btn-ghost p-2" onClick={() => setWeek(week - 1)} aria-label="שבוע קודם"><ChevronLeft className="h-4 w-4 rtl:rotate-180" /></button>
+          <span className="min-w-36 text-center text-sm">{format(days[0]!, "d בMMM", { locale: he })} – {format(days[6]!, "d בMMM", { locale: he })}</span>
+          <button className="btn-ghost p-2" onClick={() => setWeek(week + 1)} aria-label="שבוע הבא"><ChevronRight className="h-4 w-4 rtl:rotate-180" /></button>
         </div>
       </div>
       <div className="card-surface mt-6 overflow-x-auto p-4">
@@ -43,11 +44,11 @@ function Availability() {
           <div />
           {days.map((d) => (
             <div key={d.toISOString()} className="pb-2 text-center text-xs">
-              <p className="text-muted-foreground">{format(d, "EEE")}</p>
+              <p className="text-muted-foreground">{format(d, "EEEE", { locale: he })}</p>
               <p className="font-semibold">{format(d, "d")}</p>
               <div className="mt-1 flex justify-center gap-1">
-                <button className="text-[10px] text-primary hover:underline" onClick={() => setDay(d, true)}>All</button>
-                <button className="text-[10px] text-muted-foreground hover:underline" onClick={() => setDay(d, false)}>Block</button>
+                <button className="text-[10px] text-primary hover:underline" onClick={() => setDay(d, true)}>הכול</button>
+                <button className="text-[10px] text-muted-foreground hover:underline" onClick={() => setDay(d, false)}>חסימה</button>
               </div>
             </div>
           ))}
@@ -65,7 +66,7 @@ function Availability() {
           ))}
         </div>
       </div>
-      <p className="mt-3 text-sm text-muted-foreground">{Object.values(av).filter(Boolean).length} hours marked available</p>
+      <p className="mt-3 text-sm text-muted-foreground">{Object.values(av).filter(Boolean).length} שעות מסומנות כפנויות</p>
     </div>
   );
 }

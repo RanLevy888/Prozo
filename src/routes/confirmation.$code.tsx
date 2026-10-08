@@ -22,7 +22,7 @@ function Confirmation() {
   const b = bookings.find((x) => x.code === code);
   const pro = PROS.find((p) => p.id === b?.proId);
   const done = b?.status === "accepted" ? 3 : 2;
-  const timeline = ["בקשת ההזמנה נשלחה", "התשלום אושר (מוחזק בנאמנות)", "המקצוען מאשר את המשמרת", "המשמרת הושלמה", "התשלום מועבר למקצוען"];
+  const timeline = ["בקשת ההזמנה נשלחה", "התשלום אושר (מוחזק בנאמנות)", "איש המקצוע מאשר את ההזמנה", "העבודה הושלמה", "התשלום מועבר לאיש המקצוע"];
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 text-center">

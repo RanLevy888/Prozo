@@ -71,12 +71,12 @@ function ProPage() {
         </section>
 
         <section>
-          <h2 className="mb-3 text-xl font-semibold">{pro.profession === "photographer" ? "תיק עבודות" : "גלריה"}</h2>
+          <h2 className="mb-3 text-xl font-semibold">{"תיק עבודות"}</h2>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
             {pro.gallery.map((g, i) => (
               <figure key={g}>
                 <img src={g} alt={`עבודה ${i + 1} של ${pro.name}`} loading="lazy" className="aspect-[4/3] w-full rounded-xl object-cover" />
-                <figcaption className="mt-1 text-xs text-muted-foreground">{pro.profession === "photographer" ? `מתוך אירוע #${i + 1}` : `משמרת #${i + 1}`}</figcaption>
+                <figcaption className="mt-1 text-xs text-muted-foreground">{pro.profession === "photographer" ? `מתוך אירוע ${i + 1}` : `עבודה ${i + 1}`}</figcaption>
               </figure>
             ))}
           </div>

@@ -7,10 +7,10 @@ export const Route = createFileRoute("/portal")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Pro portal — Prozo" },
-      { name: "description", content: "Manage your Prozo bookings, documents and availability." },
-      { property: "og:title", content: "Pro portal — Prozo" },
-      { property: "og:description", content: "Your Prozo pro workspace." },
+      { title: "אזור המקצוענים — Prozo" },
+      { name: "description", content: "ניהול הזמנות, מסמכים וזמינות ב-Prozo." },
+      { property: "og:title", content: "אזור המקצוענים — Prozo" },
+      { property: "og:description", content: "סביבת העבודה שלכם ב-Prozo." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -28,12 +28,12 @@ function PortalLayout() {
   useEffect(() => {
     if (ready && !loggedIn) nav({ to: "/login" });
   }, [ready, loggedIn, nav]);
-  if (!loggedIn || !account) return <div className="p-20 text-center text-muted-foreground">Loading…</div>;
+  if (!loggedIn || !account) return <div className="p-20 text-center text-muted-foreground">טוען…</div>;
 
   const links = [
-    { to: "/portal", label: "Dashboard", I: LayoutDashboard },
-    { to: "/portal/documents", label: "Documents", I: FileCheck },
-    { to: "/portal/availability", label: "Availability", I: CalendarDays },
+    { to: "/portal", label: "לוח בקרה", I: LayoutDashboard },
+    { to: "/portal/documents", label: "מסמכים", I: FileCheck },
+    { to: "/portal/availability", label: "זמינות", I: CalendarDays },
   ] as const;
 
   return (
@@ -49,7 +49,7 @@ function PortalLayout() {
           </Link>
         ))}
         <button onClick={() => { logout(); nav({ to: "/", replace: true }); }} className="flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-secondary">
-          <LogOut className="h-4 w-4" />Log out
+          <LogOut className="h-4 w-4" />התנתקות
         </button>
       </aside>
       <section><Outlet /></section>

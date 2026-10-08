@@ -18,7 +18,7 @@ export const Route = createFileRoute("/book/$id")({
   head: () => ({
     meta: [
       { title: "תשלום מאובטח — Prozo" },
-      { name: "description", content: "השלימו את ההזמנה. הכרטיס מאושר בנאמנות עד לסיום המשמרת." },
+      { name: "description", content: "השלימו את ההזמנה. הכרטיס מאושר בנאמנות עד לסיום העבודה." },
       { property: "og:title", content: "תשלום מאובטח — Prozo" },
       { property: "og:description", content: "הזמנת איש מקצוע מוסמך בצורה מאובטחת." },
       { name: "robots", content: "noindex" },
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/book/$id")({
   component: BookPage,
 });
 
-const steps = ["פרטי האירוע", "פרטי קשר", "תשלום"];
+const steps = ["פרטי העבודה", "פרטי קשר", "תשלום"];
 
 function BookPage() {
   const { pro } = Route.useLoaderData();
@@ -77,7 +77,7 @@ function BookPage() {
 
         <div className="card-surface mt-6 space-y-4 p-6">
           {step === 0 && (<>
-            <label className="block text-sm">כתובת האירוע<input className="field mt-1" placeholder="רחוב, מספר, עיר" value={f.location} onChange={set("location")} /></label>
+            <label className="block text-sm">כתובת העבודה<input className="field mt-1" placeholder="רחוב, מספר, עיר" value={f.location} onChange={set("location")} /></label>
             <div className="grid gap-4 sm:grid-cols-3">
               <label className="text-sm">תאריך<input type="date" className="field mt-1" value={f.date} onChange={set("date")} /></label>
               <label className="text-sm">שעת התחלה<input type="time" className="field mt-1" value={f.start} onChange={set("start")} /></label>
@@ -93,7 +93,7 @@ function BookPage() {
             </div>
           </>)}
           {step === 2 && (<>
-            <div className="flex items-center gap-2 rounded-lg bg-accent p-3 text-sm"><Lock className="h-4 w-4 shrink-0 text-primary" />הכרטיס רק מאושר מראש (מוחזק בנאמנות). החיוב יתבצע רק לאחר סיום המשמרת.</div>
+            <div className="flex items-center gap-2 rounded-lg bg-accent p-3 text-sm"><Lock className="h-4 w-4 shrink-0 text-primary" />הכרטיס רק מאושר מראש (מוחזק בנאמנות). החיוב יתבצע רק לאחר סיום העבודה.</div>
             <label className="block text-sm">שם בעל/ת הכרטיס<input className="field mt-1" value={f.holder} onChange={set("holder")} /></label>
             <label className="block text-sm">מספר כרטיס
               <div className="relative mt-1" dir="ltr"><CreditCard className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />

@@ -8,7 +8,7 @@ export const Route = createFileRoute("/join")({
   head: () => ({
     meta: [
       { title: "הצטרפות כמקצוען — Prozo" },
-      { name: "description", content: "מצילים, מאבטחים, חובשים וצלמים — קבלו הזמנות לאירועים באזורכם." },
+      { name: "description", content: "אנשי מקצוע מכל התחומים — קבלו הזמנות עבודה באזורכם." },
       { property: "og:title", content: "הצטרפות כמקצוען — Prozo" },
       { property: "og:description", content: "קובעים מחיר, אזור שירות ולוח זמנים. מקבלים תשלום מאובטח." },
     ],

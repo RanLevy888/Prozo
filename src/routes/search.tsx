@@ -20,10 +20,10 @@ export const Route = createFileRoute("/search")({
   },
   head: () => ({
     meta: [
-      { title: "חיפוש מקצוענים לאירוע — Prozo" },
-      { name: "description", content: "מצילים, מאבטחים, חובשים וצלמי אירועים מאומתים באזורכם." },
-      { property: "og:title", content: "חיפוש מקצוענים לאירוע — Prozo" },
-      { property: "og:description", content: "השוו והזמינו אנשי מקצוע מוסמכים לאירוע שלכם." },
+      { title: "חיפוש אנשי מקצוע — Prozo" },
+      { name: "description", content: "אנשי מקצוע מאומתים באזורכם, זמינים להזמנה מיידית." },
+      { property: "og:title", content: "חיפוש אנשי מקצוע — Prozo" },
+      { property: "og:description", content: "השוו והזמינו אנשי מקצוע מוסמכים." },
     ],
   }),
   component: SearchPage,

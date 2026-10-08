@@ -44,7 +44,7 @@ function SearchPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
       <h1 className="text-3xl font-bold">
-        {results.length > 0 ? `${results.length} מקצוענים זמינים` : "לא נמצאו מקצוענים"}
+        {results.length > 0 ? results.length === 1 ? "נמצא איש מקצוע אחד" : `נמצאו ${results.length} אנשי מקצוע` : "לא נמצאו אנשי מקצוע"}
       </h1>
       <p className="mt-1 text-muted-foreground">
         {s.profession ? professionLabel(s.profession) : "כל המקצועות"}

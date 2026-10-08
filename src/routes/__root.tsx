@@ -57,7 +57,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Prozo — אנשי מקצוע מאומתים, לפי דרישה" },
-      { name: "description", content: "Book vetted lifeguards, security, medics and photographers for your event." },
+      { name: "description", content: "פלטפורמה להזמנת אנשי מקצוע מאומתים ומוסמכים — מהר ובלי הרשמה." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

@@ -8,10 +8,11 @@ export const Route = createFileRoute("/portal/")({
 });
 
 function Dashboard() {
-  const { bookings, setBookingStatus, account } = useStore();
+  const { bookings: all, setBookingStatus, account } = useStore();
+  const bookings = all.filter((b) => b.proId === account?.proId);
   const pending = bookings.filter((b) => b.status === "pending");
   const upcoming = bookings.filter((b) => b.status === "accepted").sort((a, b) => a.date.localeCompare(b.date));
-  const earnings = upcoming.reduce((s, b) => s + Math.round(b.total / 1.1), 0) + 12480;
+  const earnings = upcoming.reduce((s, b) => s + Math.round(b.total / 1.1), 0);
   const docsOk = account && Object.values(account.docs).every((d) => d === "approved");
 
   return (
@@ -34,7 +35,7 @@ function Dashboard() {
 
       <section>
         <h2 className="mb-3 text-lg font-semibold">בקשות נכנסות</h2>
-        {pending.length === 0 && <p className="card-surface p-6 text-sm text-muted-foreground">אין בקשות חדשות כרגע.</p>}
+        {pending.length === 0 && <p className="card-surface p-6 text-sm text-muted-foreground">עדיין אין בקשות נכנסות.</p>}
         <div className="space-y-3">
           {pending.map((b) => (
             <Row key={b.code} b={b}>
@@ -48,6 +49,7 @@ function Dashboard() {
       <section>
         <h2 className="mb-3 text-lg font-semibold">עבודות מאושרות קרובות</h2>
         <div className="space-y-3">
+          {upcoming.length === 0 && <p className="card-surface p-6 text-sm text-muted-foreground">אין עבודות מאושרות כרגע.</p>}
           {upcoming.map((b) => <Row key={b.code} b={b}><span className="rounded-full bg-success/15 px-3 py-1 text-xs text-success">מאושר</span></Row>)}
         </div>
       </section>

@@ -35,6 +35,8 @@ export interface Pro {
   gallery: string[];
   reviews: Review[];
   years: number;
+  availableNow: boolean;
+  isNew?: boolean;
 }
 
 const certs: Record<Profession, string[]> = {
@@ -106,6 +108,7 @@ export const PROS: Pro[] = raw.map(([name, profession, cityIdx, rate, img], i) =
   bio: bios[profession],
   certifications: certs[profession],
   years: 2 + (i % 9),
+  availableNow: true,
   gallery:
     ["photographer", "waiter"].includes(profession)
       ? Array.from({ length: 6 }, (_, g) => `https://picsum.photos/seed/prozo-${i}-${g}/600/450`)

@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckCircle2, Circle } from "lucide-react";
 import { useStore } from "@/lib/store";
-import { PROS } from "@/lib/data";
 
 export const Route = createFileRoute("/confirmation/$code")({
   head: () => ({
@@ -18,9 +17,9 @@ export const Route = createFileRoute("/confirmation/$code")({
 
 function Confirmation() {
   const { code } = Route.useParams();
-  const { bookings } = useStore();
+  const { bookings, pros } = useStore();
   const b = bookings.find((x) => x.code === code);
-  const pro = PROS.find((p) => p.id === b?.proId);
+  const pro = pros.find((p) => p.id === b?.proId);
   const done = b?.status === "accepted" ? 3 : 2;
   const timeline = ["בקשת ההזמנה נשלחה", "התשלום אושר (מוחזק בנאמנות)", "איש המקצוע מאשר את ההזמנה", "העבודה הושלמה", "התשלום מועבר לאיש המקצוע"];
 

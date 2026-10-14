@@ -1,20 +1,15 @@
-import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Lock, CreditCard, Check } from "lucide-react";
 import { toast } from "sonner";
-import { PROS, calcPrice, hoursBetween, professionLabel } from "@/lib/data";
-import { useStore } from "@/lib/store";
+import { type Pro, calcPrice, hoursBetween, professionLabel } from "@/lib/data";
+import { useStore, todayStr, nowTimeStr, isPast } from "@/lib/store";
 
 type S = { date?: string | undefined; start?: string | undefined; end?: string | undefined };
 const str = (v: unknown) => (v === undefined || v === null || v === "" ? undefined : String(v));
 
 export const Route = createFileRoute("/book/$id")({
   validateSearch: (s: Record<string, unknown>): S => ({ date: str(s["date"]), start: str(s["start"]), end: str(s["end"]) }),
-  loader: ({ params }) => {
-    const pro = PROS.find((p) => p.id === params.id);
-    if (!pro) throw notFound();
-    return { pro };
-  },
   head: () => ({
     meta: [
       { title: "תשלום מאובטח — Prozo" },
@@ -30,7 +25,14 @@ export const Route = createFileRoute("/book/$id")({
 const steps = ["פרטי העבודה", "פרטי קשר", "תשלום"];
 
 function BookPage() {
-  const { pro } = Route.useLoaderData();
+  const { id } = Route.useParams();
+  const { pros, hydrated } = useStore();
+  const pro = pros.find((p) => p.id === id);
+  if (!pro) return hydrated ? <div className="p-20 text-center">איש המקצוע לא נמצא. <Link to="/search" className="text-primary">חזרה לחיפוש</Link></div> : <div className="p-20 text-center text-muted-foreground">טוען…</div>;
+  return <BookView pro={pro} />;
+}
+
+function BookView({ pro }: { pro: Pro }) {
   const s = Route.useSearch();
   const { addBooking } = useStore();
   const nav = useNavigate();
@@ -45,7 +47,7 @@ function BookPage() {
   const price = calcPrice(pro.rate, hours);
 
   const valid = [
-    f.location && f.date && f.start && f.end,
+    f.location && f.date && f.start && f.end && !isPast(f.date, f.start) && pro.availableNow,
     f.name && f.phone.replace(/\D/g, "").length >= 9 && /\S+@\S+\.\S+/.test(f.email),
     f.card.replace(/\s/g, "").length >= 15 && f.exp.length >= 4 && f.cvc.length >= 3 && f.holder,
   ];
@@ -79,10 +81,12 @@ function BookPage() {
           {step === 0 && (<>
             <label className="block text-sm">כתובת העבודה<input className="field mt-1" placeholder="רחוב, מספר, עיר" value={f.location} onChange={set("location")} /></label>
             <div className="grid gap-4 sm:grid-cols-3">
-              <label className="text-sm">תאריך<input type="date" className="field mt-1" value={f.date} onChange={set("date")} /></label>
-              <label className="text-sm">שעת התחלה<input type="time" className="field mt-1" value={f.start} onChange={set("start")} /></label>
+              <label className="text-sm">תאריך<input type="date" min={todayStr()} className="field mt-1" value={f.date} onChange={set("date")} /></label>
+              <label className="text-sm">שעת התחלה<input type="time" min={f.date === todayStr() ? nowTimeStr() : undefined} className="field mt-1" value={f.start} onChange={set("start")} /></label>
               <label className="text-sm">שעת סיום<input type="time" className="field mt-1" value={f.end} onChange={set("end")} /></label>
             </div>
+            {isPast(f.date, f.start) && <p className="text-sm text-destructive">התאריך או השעה שבחרתם כבר עברו. בחרו מועד עתידי.</p>}
+            {!pro.availableNow && <p className="text-sm text-warning">איש המקצוע לא זמין כרגע להזמנות.</p>}
           </>)}
           {step === 1 && (<>
             <p className="text-sm text-muted-foreground">לא צריך לפתוח חשבון — נשלח לכאן עדכונים על ההזמנה.</p>

@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Search, ShieldCheck, Zap, BadgeCheck, LifeBuoy, Shield, HeartPulse, Camera, Plug, Wrench, Sparkles, GlassWater } from "lucide-react";
-import { CITIES, PROFESSIONS, PROS } from "@/lib/data";
+import { CITIES, PROFESSIONS } from "@/lib/data";
+import { useStore, todayStr } from "@/lib/store";
 import { ProCard } from "@/components/site";
 
 export const Route = createFileRoute("/")({
@@ -20,6 +21,7 @@ const icons = { lifeguard: LifeBuoy, security: Shield, medic: HeartPulse, photog
 
 function Index() {
   const nav = useNavigate();
+  const { pros } = useStore();
   const [profession, setProfession] = useState("");
   const [city, setCity] = useState("");
   const [date, setDate] = useState("");
@@ -71,7 +73,7 @@ function Index() {
               <datalist id="cities">{CITIES.map((c) => <option key={c.he} value={c.he} />)}</datalist>
             </label>
             <label className="text-xs text-muted-foreground">תאריך
-              <input name="date" type="date" className="field mt-1" value={date} onChange={(e) => setDate(e.target.value)} />
+              <input name="date" type="date" min={todayStr()} className="field mt-1" value={date} onChange={(e) => setDate(e.target.value)} />
             </label>
             <label className="text-xs text-muted-foreground">משך (שעות)
               <input name="hours" type="number" min={1} max={24} className="field mt-1" value={hours} onChange={(e) => setHours(+e.target.value)} />
@@ -115,7 +117,7 @@ function Index() {
           <Link to="/search" className="text-sm text-primary hover:underline">לכל המקצוענים ←</Link>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {[...PROS].sort((a, b) => b.rating - a.rating).slice(0, 8).map((p) => <ProCard key={p.id} pro={p} />)}
+          {[...pros].filter((p) => !p.isNew).sort((a, b) => b.rating - a.rating).slice(0, 8).map((p) => <ProCard key={p.id} pro={p} />)}
         </div>
       </section>
     </>

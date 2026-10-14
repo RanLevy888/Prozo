@@ -18,8 +18,7 @@ export const Route = createFileRoute("/portal")({
 });
 
 function PortalLayout() {
-  const { loggedIn, account, logout, hydrated, pros, setAvailableNow } = useStore();
-  const me = pros.find((p) => p.id === account?.proId);
+  const { loggedIn, account, logout, hydrated } = useStore();
   const nav = useNavigate();
   useEffect(() => {
     if (hydrated && !loggedIn) nav({ to: "/login" });
@@ -38,10 +37,6 @@ function PortalLayout() {
         <div className="hidden px-3 py-3 md:block">
           <p className="font-semibold">{account.name}</p>
           <p className="text-xs text-muted-foreground">{account.email}</p>
-          <button onClick={() => setAvailableNow(!me?.availableNow)} aria-pressed={!!me?.availableNow} className={`mt-3 flex w-full items-center justify-between rounded-lg border px-3 py-2 text-xs ${me?.availableNow ? "border-success/40 text-success" : "text-muted-foreground"}`}>
-            <span>{me?.availableNow ? "זמין עכשיו" : "לא זמין"}</span>
-            <span className={`h-2 w-2 rounded-full ${me?.availableNow ? "bg-success" : "bg-muted-foreground"}`} />
-          </button>
         </div>
         {links.map(({ to, label, I }) => (
           <Link key={to} to={to} activeOptions={{ exact: true }} className="flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-secondary" activeProps={{ className: "bg-accent text-foreground" }}>

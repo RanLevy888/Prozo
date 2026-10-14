@@ -8,7 +8,8 @@ export const Route = createFileRoute("/portal/")({
 });
 
 function Dashboard() {
-  const { bookings: all, setBookingStatus, account } = useStore();
+  const { bookings: all, setBookingStatus, account, pros, setAvailableNow } = useStore();
+  const me = pros.find((p) => p.id === account?.proId);
   const bookings = all.filter((b) => b.proId === account?.proId);
   const pending = bookings.filter((b) => b.status === "pending");
   const upcoming = bookings.filter((b) => b.status === "accepted").sort((a, b) => a.date.localeCompare(b.date));
@@ -17,7 +18,14 @@ function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">שלום, {account?.name.split(" ")[0]}</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold">שלום, {account?.name.split(" ")[0]}</h1>
+        <button onClick={() => { setAvailableNow(!me?.availableNow); toast(me?.availableNow ? "סומנתם כלא זמינים" : "סומנתם כזמינים עכשיו"); }} aria-pressed={!!me?.availableNow}
+          className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm ${me?.availableNow ? "border-success/40 bg-success/10 text-success" : "text-muted-foreground"}`}>
+          <span className={`h-2 w-2 rounded-full ${me?.availableNow ? "bg-success" : "bg-muted-foreground"}`} />
+          {me?.availableNow ? "זמין עכשיו" : "לא זמין"}
+        </button>
+      </div>
       {!docsOk && <div className="rounded-xl border border-warning/40 bg-warning/10 p-4 text-sm text-warning">חלק מהמסמכים עדיין ממתינים לבדיקה. הפרופיל יעלה לאוויר במלואו לאחר אישור כולם.</div>}
       <div className="grid gap-4 sm:grid-cols-3">
         {[

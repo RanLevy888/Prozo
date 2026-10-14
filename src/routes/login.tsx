@@ -23,7 +23,7 @@ function Login() {
   return (
     <div className="mx-auto max-w-md px-4 py-16">
       <h1 className="text-3xl font-bold">כניסת מקצוענים</h1>
-      <p className="mt-2 text-sm text-muted-foreground">גרסת הדגמה: כל אימייל עם סיסמה של 4 תווים ומעלה.</p>
+      <p className="mt-2 text-sm text-muted-foreground">התחברו עם האימייל והסיסמה שבחרתם בהרשמה.</p>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -35,7 +35,7 @@ function Login() {
         <label className="block text-sm">אימייל<input required type="email" dir="ltr" className="field mt-1 text-end" value={email} onChange={(e) => setEmail(e.target.value)} /></label>
         <label className="block text-sm">סיסמה<input required type="password" className="field mt-1" value={password} onChange={(e) => setPassword(e.target.value)} /></label>
         <button className="btn-primary w-full">התחברות</button>
-        <p className="text-center text-sm text-muted-foreground">חדשים כאן? <Link to="/join" className="text-primary">הצטרפו כמקצוענים</Link></p>
+        <p className="text-center text-sm text-muted-foreground">עדיין לא הצטרפתם אלינו? <Link to="/join" className="text-primary hover:underline">הרשמה כמקצוען</Link></p>
       </form>
     </div>
   );

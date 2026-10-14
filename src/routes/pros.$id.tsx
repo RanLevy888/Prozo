@@ -1,17 +1,16 @@
-import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { BadgeCheck, Award, MapPin, Clock, ShieldCheck } from "lucide-react";
 import { PROS, calcPrice, professionLabel, hoursBetween } from "@/lib/data";
 import { Stars } from "@/components/site";
+import { useStore, todayStr, isPast } from "@/lib/store";
 
 export const Route = createFileRoute("/pros/$id")({
   loader: ({ params }) => {
-    const pro = PROS.find((p) => p.id === params.id);
-    if (!pro) throw notFound();
-    return { pro };
+    return { pro: PROS.find((p) => p.id === params.id) ?? null };
   },
   head: ({ loaderData }) => {
-    if (!loaderData) return { meta: [{ title: "המקצוען לא נמצא — Prozo" }, { name: "robots", content: "noindex" }] };
+    if (!loaderData?.pro) return { meta: [{ title: "פרופיל איש מקצוע — Prozo" }, { name: "description", content: "פרופיל איש מקצוע מאומת ב-Prozo." }, { property: "og:title", content: "פרופיל איש מקצוע — Prozo" }, { property: "og:description", content: "פרופיל איש מקצוע מאומת ב-Prozo." }] };
     const { pro } = loaderData;
     const title = `${pro.name} · ${professionLabel(pro.profession)} ב${pro.city} — Prozo`;
     return {
@@ -25,12 +24,18 @@ export const Route = createFileRoute("/pros/$id")({
       ],
     };
   },
-  notFoundComponent: () => <div className="p-20 text-center">המקצוען לא נמצא. <Link to="/search" className="text-primary">חזרה לחיפוש</Link></div>,
   component: ProPage,
 });
 
 function ProPage() {
-  const { pro } = Route.useLoaderData();
+  const { id } = Route.useParams();
+  const { pros, hydrated } = useStore();
+  const pro = pros.find((p) => p.id === id);
+  if (!pro) return hydrated ? <div className="p-20 text-center">איש המקצוע לא נמצא. <Link to="/search" className="text-primary">חזרה לחיפוש</Link></div> : <div className="p-20 text-center text-muted-foreground">טוען…</div>;
+  return <ProView pro={pro} />;
+}
+
+function ProView({ pro }: { pro: import("@/lib/data").Pro }) {
   const nav = useNavigate();
   const [date, setDate] = useState("");
   const [start, setStart] = useState("18:00");
@@ -100,7 +105,7 @@ function ProPage() {
           <p className="text-2xl font-bold">₪{pro.rate}<span className="text-sm font-normal text-muted-foreground"> / לשעה</span></p>
           <p className="text-xs text-muted-foreground">מינימום {pro.minHours} שעות</p>
           <div className="mt-5 space-y-3">
-            <label className="block text-xs text-muted-foreground">תאריך<input type="date" className="field mt-1" value={date} onChange={(e) => setDate(e.target.value)} /></label>
+            <label className="block text-xs text-muted-foreground">תאריך<input type="date" min={todayStr()} className="field mt-1" value={date} onChange={(e) => setDate(e.target.value)} /></label>
             <div className="grid grid-cols-2 gap-3">
               <label className="text-xs text-muted-foreground">שעת התחלה<input type="time" className="field mt-1" value={start} onChange={(e) => setStart(e.target.value)} /></label>
               <label className="text-xs text-muted-foreground">שעת סיום<input type="time" className="field mt-1" value={end} onChange={(e) => setEnd(e.target.value)} /></label>
@@ -111,7 +116,9 @@ function ProPage() {
             <div className="flex justify-between"><dt className="text-muted-foreground">דמי שירות (10%)</dt><dd>₪{price.fee}</dd></div>
             <div className="flex justify-between text-base font-bold"><dt>סה״כ</dt><dd>₪{price.total}</dd></div>
           </dl>
-          <button className="btn-primary mt-5 w-full" onClick={() => nav({ to: "/book/$id", params: { id: pro.id }, search: { date: date || undefined, start, end } })}>להזמנה</button>
+          {isPast(date, start) && <p className="mt-3 text-xs text-destructive">לא ניתן לבחור תאריך או שעה שכבר עברו.</p>}
+          {!pro.availableNow && <p className="mt-3 text-xs text-warning">איש המקצוע לא זמין כרגע להזמנות.</p>}
+          <button className="btn-primary mt-5 w-full" disabled={!pro.availableNow || isPast(date, start)} onClick={() => nav({ to: "/book/$id", params: { id: pro.id }, search: { date: date || undefined, start, end } })}>להזמנה</button>
           <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted-foreground"><ShieldCheck className="h-3.5 w-3.5" />ללא צורך בחשבון · התשלום מוחזק בנאמנות</p>
         </div>
       </aside>

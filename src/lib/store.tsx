@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import type { Profession } from "./data";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { PROS, CITIES, type Pro, type Profession } from "./data";
 
 export interface Booking {
   code: string;
@@ -17,11 +17,13 @@ export interface Booking {
   createdAt: string;
 }
 export interface ProAccount {
+  proId: string;
   name: string;
   phone: string;
   email: string;
   password: string;
   profession: Profession;
+  city: string;
   rate: number;
   minHours: number;
   radius: number;
@@ -30,25 +32,21 @@ export interface ProAccount {
 }
 
 interface Store {
+  hydrated: boolean;
+  pros: Pro[];
   bookings: Booking[];
   addBooking: (b: Booking) => void;
   setBookingStatus: (code: string, s: Booking["status"]) => void;
   account: ProAccount | null;
   loggedIn: boolean;
-  register: (a: ProAccount) => void;
+  register: (a: Omit<ProAccount, "proId" | "docs" | "availability">) => void;
   login: (email: string, password: string) => boolean;
   logout: () => void;
   updateAccount: (p: Partial<ProAccount>) => void;
+  setAvailableNow: (v: boolean) => void;
 }
 
 const Ctx = createContext<Store | null>(null);
-
-const seedBookings: Booking[] = [
-  { code: "PZ-48KQ2", proId: "pro-1", date: "2026-10-12", start: "14:00", end: "20:00", hours: 6, location: "וילה, כפר שמריהו", clientName: "דנה רוזן", phone: "052-555-1212", email: "dana@example.com", total: 924, status: "pending", createdAt: "2026-10-03" },
-  { code: "PZ-91TX7", proId: "pro-1", date: "2026-10-18", start: "10:00", end: "16:00", hours: 6, location: "בריכת מלון הילטון, תל אביב", clientName: "יוסי קליין", phone: "054-333-9090", email: "yossi@example.com", total: 924, status: "pending", createdAt: "2026-10-02" },
-  { code: "PZ-22MN4", proId: "pro-1", date: "2026-10-09", start: "12:00", end: "18:00", hours: 6, location: "מרינה הרצליה", clientName: "הילה מור", phone: "050-777-1111", email: "hila@example.com", total: 924, status: "accepted", createdAt: "2026-09-28" },
-  { code: "PZ-73LP0", proId: "pro-1", date: "2026-10-25", start: "15:00", end: "21:00", hours: 6, location: "אחוזה פרטית, סביון", clientName: "עמית סגל", phone: "053-222-4545", email: "amit@example.com", total: 924, status: "accepted", createdAt: "2026-09-30" },
-];
 
 function useLS<T>(key: string, init: T) {
   const [v, setV] = useState<T>(init);
@@ -63,32 +61,79 @@ function useLS<T>(key: string, init: T) {
   useEffect(() => {
     if (ready) localStorage.setItem(key, JSON.stringify(v));
   }, [key, v, ready]);
-  return [v, setV] as const;
+  return [v, setV, ready] as const;
+}
+
+const BIO_NEW = "איש/אשת מקצוע חדש/ה ב-Prozo. הפרופיל המלא יתעדכן בקרוב.";
+
+function proFromAccount(a: ProAccount, availableNow: boolean): Pro {
+  return {
+    id: a.proId,
+    name: a.name,
+    profession: a.profession,
+    city: a.city,
+    rate: a.rate,
+    minHours: a.minHours,
+    rating: 0,
+    reviewsCount: 0,
+    avatar: `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(a.name)}&backgroundColor=3b5bdb`,
+    bio: BIO_NEW,
+    certifications: [],
+    gallery: [],
+    reviews: [],
+    years: 0,
+    availableNow,
+    isNew: true,
+  };
 }
 
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const [bookings, setBookings] = useLS<Booking[]>("prozo-bookings-he", seedBookings);
-  const [account, setAccount] = useLS<ProAccount | null>("prozo-account-he", null);
-  const [loggedIn, setLoggedIn] = useLS<boolean>("prozo-auth", false);
+  const [bookings, setBookings, r1] = useLS<Booking[]>("prozo-bookings-v2", []);
+  const [accounts, setAccounts, r2] = useLS<ProAccount[]>("prozo-accounts-v2", []);
+  const [activeEmail, setActiveEmail, r3] = useLS<string | null>("prozo-active-v2", null);
+  const [availNow, setAvailNow, r4] = useLS<Record<string, boolean>>("prozo-available-now-v2", {});
+  const hydrated = r1 && r2 && r3 && r4;
+
+  const account = accounts.find((a) => a.email === activeEmail) ?? null;
+
+  const pros = useMemo(
+    () => [
+      ...accounts.map((a) => proFromAccount(a, availNow[a.proId] ?? true)),
+      ...PROS.map((p) => ({ ...p, availableNow: availNow[p.id] ?? p.availableNow })),
+    ],
+    [accounts, availNow],
+  );
 
   const value: Store = {
+    hydrated,
+    pros,
     bookings,
     addBooking: (b) => setBookings((p) => [b, ...p]),
     setBookingStatus: (code, s) => setBookings((p) => p.map((b) => (b.code === code ? { ...b, status: s } : b))),
     account,
-    loggedIn,
-    register: (a) => { setAccount(a); setLoggedIn(true); },
-    login: (email, password) => {
-      if (account && account.email === email && account.password === password) { setLoggedIn(true); return true; }
-      if (!account && email && password.length >= 4) {
-        setAccount({ name: "נועה לוי", phone: "052-000-0000", email, password, profession: "lifeguard", rate: 140, minHours: 4, radius: 25, docs: { id: "approved", cert: "approved", firstaid: "pending" }, availability: {} });
-        setLoggedIn(true);
-        return true;
-      }
-      return false;
+    loggedIn: !!account,
+    register: (a) => {
+      const email = a.email.trim().toLowerCase();
+      const acc: ProAccount = {
+        ...a,
+        email,
+        proId: `new-${Date.now().toString(36)}`,
+        docs: { id: "missing", cert: "missing", firstaid: "missing" },
+        availability: {},
+      };
+      setAccounts((p) => [...p.filter((x) => x.email !== email), acc]);
+      setActiveEmail(email);
     },
-    logout: () => setLoggedIn(false),
-    updateAccount: (p) => setAccount((a) => (a ? { ...a, ...p } : a)),
+    login: (email, password) => {
+      const e = email.trim().toLowerCase();
+      const acc = accounts.find((a) => a.email === e && a.password === password);
+      if (!acc) return false;
+      setActiveEmail(e);
+      return true;
+    },
+    logout: () => setActiveEmail(null),
+    updateAccount: (p) => setAccounts((all) => all.map((a) => (a.email === activeEmail ? { ...a, ...p } : a))),
+    setAvailableNow: (v) => { if (account) setAvailNow((m) => ({ ...m, [account.proId]: v })); },
   };
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
@@ -97,4 +142,24 @@ export const useStore = () => {
   const c = useContext(Ctx);
   if (!c) throw new Error("StoreProvider missing");
   return c;
+};
+
+export const DEFAULT_CITY = CITIES[0]!.he;
+
+/** Local "today" as yyyy-MM-dd and current "HH:mm". */
+export const todayStr = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
+export const nowTimeStr = () => {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+};
+/** True when date/time is in the past relative to now. */
+export const isPast = (date: string, time?: string) => {
+  if (!date) return false;
+  const t = todayStr();
+  if (date < t) return true;
+  if (date === t && time) return time < nowTimeStr();
+  return false;
 };

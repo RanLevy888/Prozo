@@ -15,16 +15,17 @@ export function Logo() {
 }
 
 export function Navbar() {
-  const { loggedIn } = useStore();
+  const { loggedIn, hydrated } = useStore();
   return (
     <header className="sticky top-0 z-40 glass border-x-0 border-t-0">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         <Logo />
         <nav className="flex items-center gap-3 sm:gap-5">
-          <Link to="/join" className="text-sm text-muted-foreground hover:text-foreground">הצטרפות כמקצוען</Link>
-          <Link to={loggedIn ? "/portal" : "/login"} className="btn-primary px-4 py-2 text-sm">
-            {loggedIn ? "לוח הבקרה" : "כניסת מקצוענים"}
-          </Link>
+          {hydrated && loggedIn ? (
+            <Link to="/portal" className="btn-primary px-4 py-2 text-sm">לוח בקרה</Link>
+          ) : (
+            <Link to="/login" className="btn-primary px-4 py-2 text-sm">כניסת מקצוענים</Link>
+          )}
         </nav>
       </div>
     </header>
@@ -61,15 +62,16 @@ export function ProCard({ pro }: { pro: Pro }) {
             <h3 className="truncate font-semibold">{pro.name}</h3>
             <BadgeCheck className="h-4 w-4 shrink-0 text-primary" aria-label="מאומת" />
           </div>
+          <span className={`ms-2 inline-flex items-center gap-1 text-[11px] ${pro.availableNow ? "text-success" : "text-muted-foreground"}`}><span className={`h-1.5 w-1.5 rounded-full ${pro.availableNow ? "bg-success" : "bg-muted-foreground"}`} />{pro.availableNow ? "זמין עכשיו" : "לא זמין"}</span>
           <span className="mt-1 inline-block rounded-full bg-accent px-2.5 py-0.5 text-xs text-accent-foreground">{professionLabel(pro.profession)}</span>
           <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{pro.city}</span>
-            <span>{pro.reviewsCount} ביקורות</span>
+            {!pro.isNew && <span>{pro.reviewsCount} ביקורות</span>}
           </div>
         </div>
       </div>
       <div className="mt-5 flex items-center justify-between border-t pt-4">
-        <Stars value={pro.rating} />
+        {pro.isNew ? <span className="text-xs text-primary">חדש ב-Prozo</span> : <Stars value={pro.rating} />}
         <span className="text-lg font-bold">₪{pro.rate}<span className="text-xs font-normal text-muted-foreground"> / לשעה</span></span>
       </div>
     </Link>

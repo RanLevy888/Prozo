@@ -1,8 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { SearchX } from "lucide-react";
-import { CITIES, PROFESSIONS, PROS, cityMatches, professionLabel } from "@/lib/data";
+import { CITIES, PROFESSIONS, cityMatches, professionLabel } from "@/lib/data";
 import { ProCard } from "@/components/site";
+import { useStore } from "@/lib/store";
 
 type S = { profession?: string | undefined; city?: string | undefined; date?: string | undefined; hours?: number | undefined };
 
@@ -33,11 +34,12 @@ function SearchPage() {
   const s = Route.useSearch();
   const nav = useNavigate({ from: "/search" });
   const [sort, setSort] = useState("rating");
+  const { pros } = useStore();
 
   const results = useMemo(() => {
-    const r = PROS.filter((p) => (!s.profession || p.profession === s.profession) && cityMatches(p.city, s.city));
-    return r.sort((a, b) => (sort === "rating" ? b.rating - a.rating : sort === "low" ? a.rate - b.rate : b.rate - a.rate));
-  }, [s.profession, s.city, sort]);
+    const r = pros.filter((p) => (!s.profession || p.profession === s.profession) && cityMatches(p.city, s.city));
+    return r.sort((a, b) => Number(b.availableNow) - Number(a.availableNow) || (sort === "rating" ? b.rating - a.rating : sort === "low" ? a.rate - b.rate : b.rate - a.rate));
+  }, [pros, s.profession, s.city, sort]);
 
   const reset = () => nav({ search: { date: s.date, hours: s.hours } });
 

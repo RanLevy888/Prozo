@@ -8,15 +8,24 @@ export const Route = createFileRoute("/portal/")({
 });
 
 function Dashboard() {
-  const { bookings, setBookingStatus, account } = useStore();
+  const { bookings: all, setBookingStatus, account, pros, setAvailableNow } = useStore();
+  const me = pros.find((p) => p.id === account?.proId);
+  const bookings = all.filter((b) => b.proId === account?.proId);
   const pending = bookings.filter((b) => b.status === "pending");
   const upcoming = bookings.filter((b) => b.status === "accepted").sort((a, b) => a.date.localeCompare(b.date));
-  const earnings = upcoming.reduce((s, b) => s + Math.round(b.total / 1.1), 0) + 12480;
+  const earnings = upcoming.reduce((s, b) => s + Math.round(b.total / 1.1), 0);
   const docsOk = account && Object.values(account.docs).every((d) => d === "approved");
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">שלום, {account?.name.split(" ")[0]}</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold">שלום, {account?.name.split(" ")[0]}</h1>
+        <button onClick={() => { setAvailableNow(!me?.availableNow); toast(me?.availableNow ? "סומנתם כלא זמינים" : "סומנתם כזמינים עכשיו"); }} aria-pressed={!!me?.availableNow}
+          className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm ${me?.availableNow ? "border-success/40 bg-success/10 text-success" : "text-muted-foreground"}`}>
+          <span className={`h-2 w-2 rounded-full ${me?.availableNow ? "bg-success" : "bg-muted-foreground"}`} />
+          {me?.availableNow ? "זמין עכשיו" : "לא זמין"}
+        </button>
+      </div>
       {!docsOk && <div className="rounded-xl border border-warning/40 bg-warning/10 p-4 text-sm text-warning">חלק מהמסמכים עדיין ממתינים לבדיקה. הפרופיל יעלה לאוויר במלואו לאחר אישור כולם.</div>}
       <div className="grid gap-4 sm:grid-cols-3">
         {[
@@ -34,7 +43,7 @@ function Dashboard() {
 
       <section>
         <h2 className="mb-3 text-lg font-semibold">בקשות נכנסות</h2>
-        {pending.length === 0 && <p className="card-surface p-6 text-sm text-muted-foreground">אין בקשות חדשות כרגע.</p>}
+        {pending.length === 0 && <p className="card-surface p-6 text-sm text-muted-foreground">עדיין אין בקשות נכנסות.</p>}
         <div className="space-y-3">
           {pending.map((b) => (
             <Row key={b.code} b={b}>
@@ -48,6 +57,7 @@ function Dashboard() {
       <section>
         <h2 className="mb-3 text-lg font-semibold">עבודות מאושרות קרובות</h2>
         <div className="space-y-3">
+          {upcoming.length === 0 && <p className="card-surface p-6 text-sm text-muted-foreground">אין עבודות מאושרות כרגע.</p>}
           {upcoming.map((b) => <Row key={b.code} b={b}><span className="rounded-full bg-success/15 px-3 py-1 text-xs text-success">מאושר</span></Row>)}
         </div>
       </section>

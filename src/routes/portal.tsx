@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { LayoutDashboard, FileCheck, CalendarDays, LogOut } from "lucide-react";
 import { useStore } from "@/lib/store";
 
@@ -18,16 +18,11 @@ export const Route = createFileRoute("/portal")({
 });
 
 function PortalLayout() {
-  const { loggedIn, account, logout } = useStore();
+  const { loggedIn, account, logout, hydrated } = useStore();
   const nav = useNavigate();
-  const [ready, setReady] = useState(false);
   useEffect(() => {
-    const t = setTimeout(() => setReady(true), 50);
-    return () => clearTimeout(t);
-  }, []);
-  useEffect(() => {
-    if (ready && !loggedIn) nav({ to: "/login" });
-  }, [ready, loggedIn, nav]);
+    if (hydrated && !loggedIn) nav({ to: "/login" });
+  }, [hydrated, loggedIn, nav]);
   if (!loggedIn || !account) return <div className="p-20 text-center text-muted-foreground">טוען…</div>;
 
   const links = [

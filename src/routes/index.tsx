@@ -51,7 +51,7 @@ function Index() {
               <span className="bg-gradient-primary bg-clip-text text-transparent">בדיוק כשצריך</span>
             </h1>
             <p className="mx-auto mt-5 max-w-xl text-lg text-muted-foreground">
-              מצילים, מאבטחים, חשמלאים, אינסטלטורים, צלמים ועוד — כולם עם רישיונות ובדיקות רקע. מזמינים בדקות, בלי הרשמה.
+              אנשי מקצוע מורשים לכל עבודה – מזמינים בדקות, בראש שקט.
             </p>
           </div>
 
@@ -117,7 +117,7 @@ function Index() {
           <Link to="/search" className="text-sm text-primary hover:underline">לכל המקצוענים ←</Link>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {[...pros].filter((p) => !p.isNew).sort((a, b) => b.rating - a.rating).slice(0, 8).map((p) => <ProCard key={p.id} pro={p} />)}
+          {[...pros].filter((p) => !p.isNew || p.verified === false).sort((a, b) => b.rating - a.rating).slice(0, 8).map((p) => <ProCard key={p.id} pro={p} />)}
         </div>
       </section>
     </>

@@ -19,10 +19,11 @@ function Availability() {
   const days = Array.from({ length: 7 }, (_, i) => addDays(start, i));
   const av = account.availability;
   const key = (d: Date, h: number) => `${format(d, "yyyy-MM-dd")}-${h}`;
+  const past = (d: Date, h: number) => { const t = new Date(d); t.setHours(h + 1, 0, 0, 0); return t <= new Date(); };
   const toggle = (k: string) => updateAccount({ availability: { ...av, [k]: !av[k] } });
   const setDay = (d: Date, v: boolean) => {
     const n = { ...av };
-    HOURS.forEach((h) => (n[key(d, h)] = v));
+    HOURS.forEach((h) => { if (!past(d, h)) n[key(d, h)] = v; });
     updateAccount({ availability: n });
   };
 
@@ -34,7 +35,7 @@ function Availability() {
           <p className="text-sm text-muted-foreground">לחצו על משבצת כדי לשנות. כחול = פנוי להזמנות.</p>
         </div>
         <div className="flex items-center gap-2">
-          <button className="btn-ghost p-2" onClick={() => setWeek(week - 1)} aria-label="שבוע קודם"><ChevronLeft className="h-4 w-4 rtl:rotate-180" /></button>
+          <button className="btn-ghost p-2" disabled={week <= 0} onClick={() => setWeek(Math.max(0, week - 1))} aria-label="שבוע קודם"><ChevronLeft className="h-4 w-4 rtl:rotate-180" /></button>
           <span className="min-w-36 text-center text-sm">{format(days[0]!, "d בMMM", { locale: he })} – {format(days[6]!, "d בMMM", { locale: he })}</span>
           <button className="btn-ghost p-2" onClick={() => setWeek(week + 1)} aria-label="שבוע הבא"><ChevronRight className="h-4 w-4 rtl:rotate-180" /></button>
         </div>
@@ -54,12 +55,13 @@ function Availability() {
           ))}
           {HOURS.map((h) => (
             <div key={h} className="contents">
-              <div className="pe-2 text-end text-[11px] leading-7 text-muted-foreground">{String(h).padStart(2, "0")}:00</div>
+              <div className="time-ltr pe-2 text-end text-[11px] leading-7 text-muted-foreground">{String(h).padStart(2, "0")}:00</div>
               {days.map((d) => {
                 const k = key(d, h);
+                const p = past(d, h);
                 return (
-                  <button key={k} onClick={() => toggle(k)} aria-pressed={!!av[k]}
-                    className={`h-7 rounded-md border transition ${av[k] ? "border-primary bg-gradient-primary" : "bg-secondary hover:bg-accent"}`} />
+                  <button key={k} disabled={p} onClick={() => toggle(k)} aria-pressed={!!av[k]}
+                    className={`h-7 rounded-md border transition ${p ? "cursor-not-allowed opacity-25" : av[k] ? "border-primary bg-gradient-primary" : "bg-secondary hover:bg-accent"}`} />
                 );
               })}
             </div>

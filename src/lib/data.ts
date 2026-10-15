@@ -37,6 +37,10 @@ export interface Pro {
   years: number;
   availableNow: boolean;
   isNew?: boolean;
+  /** false = awaiting admin approval; cannot be booked. */
+  verified?: boolean;
+  /** Explicit availability map (`yyyy-MM-dd-H` → true). Undefined = default hours. */
+  availability?: Record<string, boolean>;
 }
 
 const certs: Record<Profession, string[]> = {
@@ -131,11 +135,12 @@ export const cityMatches = (proCity: string, q?: string) => {
   return proCity.includes(query) || !!c?.en.toLowerCase().includes(query);
 };
 
-export const PLATFORM_FEE = 0.1;
+/** Flat service fee in ₪ per booking. */
+export const FIXED_FEE = 14;
 
 export const calcPrice = (rate: number, hours: number) => {
   const subtotal = rate * hours;
-  const fee = Math.round(subtotal * PLATFORM_FEE);
+  const fee = FIXED_FEE;
   return { subtotal, fee, total: subtotal + fee };
 };
 
@@ -145,4 +150,19 @@ export const hoursBetween = (start: string, end: string) => {
   let d = eh * 60 + em - (sh * 60 + sm);
   if (d <= 0) d += 24 * 60;
   return Math.round((d / 60) * 2) / 2;
+};
+
+/** Hours a pro can be scheduled (07:00–22:00 slots). */
+export const SLOT_HOURS = Array.from({ length: 16 }, (_, i) => i + 7);
+const DEFAULT_HOURS = SLOT_HOURS.filter((h) => h >= 8 && h <= 21);
+export const hh = (h: number) => `${String(h).padStart(2, "0")}:00`;
+
+/** Bookable start hours for a pro on a date, excluding past hours. */
+export const availableHours = (pro: Pro, date: string): number[] => {
+  if (!date) return [];
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  if (date < today) return [];
+  const base = pro.availability ? SLOT_HOURS.filter((h) => pro.availability![`${date}-${h}`]) : DEFAULT_HOURS;
+  return date === today ? base.filter((h) => h > now.getHours()) : base;
 };

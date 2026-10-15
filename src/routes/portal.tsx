@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { LayoutDashboard, FileCheck, CalendarDays, LogOut } from "lucide-react";
+import { LayoutDashboard, FileCheck, CalendarDays, LogOut, UserRound } from "lucide-react";
 import { useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/portal")({
@@ -27,6 +27,7 @@ function PortalLayout() {
 
   const links = [
     { to: "/portal", label: "לוח בקרה", I: LayoutDashboard },
+    { to: "/portal/profile", label: "פרופיל", I: UserRound },
     { to: "/portal/documents", label: "מסמכים", I: FileCheck },
     { to: "/portal/availability", label: "זמינות", I: CalendarDays },
   ] as const;

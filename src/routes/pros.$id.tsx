@@ -4,7 +4,7 @@ import { BadgeCheck, Award, MapPin, Clock, ShieldCheck } from "lucide-react";
 import { PROS, calcPrice, professionLabel, hoursBetween } from "@/lib/data";
 import { Stars } from "@/components/site";
 import { SlotPicker } from "@/components/slots";
-import { useStore, todayStr, isPast } from "@/lib/store";
+import { useStore, isPast } from "@/lib/store";
 
 export const Route = createFileRoute("/pros/$id")({
   loader: ({ params }) => {

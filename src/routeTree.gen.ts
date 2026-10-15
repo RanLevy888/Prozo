@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as PortalRouteImport } from './routes/portal'
@@ -19,11 +20,17 @@ import { Route as ConfirmationCodeRouteImport } from './routes/confirmation.$cod
 import { Route as PortalIndexRouteImport } from './routes/portal.index'
 import { Route as PortalAvailabilityRouteImport } from './routes/portal.availability'
 import { Route as PortalDocumentsRouteImport } from './routes/portal.documents'
+import { Route as PortalProfileRouteImport } from './routes/portal.profile'
 import { Route as ProsIdRouteImport } from './routes/pros.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JoinRoute = JoinRouteImport.update({
@@ -71,6 +78,11 @@ const PortalDocumentsRoute = PortalDocumentsRouteImport.update({
   path: '/documents',
   getParentRoute: () => PortalRoute,
 } as any)
+const PortalProfileRoute = PortalProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => PortalRoute,
+} as any)
 const ProsIdRoute = ProsIdRouteImport.update({
   id: '/pros/$id',
   path: '/pros/$id',
@@ -79,6 +91,7 @@ const ProsIdRoute = ProsIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/join': typeof JoinRoute
   '/login': typeof LoginRoute
   '/portal': typeof PortalRouteWithChildren
@@ -87,11 +100,13 @@ export interface FileRoutesByFullPath {
   '/confirmation/$code': typeof ConfirmationCodeRoute
   '/portal/availability': typeof PortalAvailabilityRoute
   '/portal/documents': typeof PortalDocumentsRoute
+  '/portal/profile': typeof PortalProfileRoute
   '/pros/$id': typeof ProsIdRoute
   '/portal/': typeof PortalIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/join': typeof JoinRoute
   '/login': typeof LoginRoute
   '/search': typeof SearchRoute
@@ -99,12 +114,14 @@ export interface FileRoutesByTo {
   '/confirmation/$code': typeof ConfirmationCodeRoute
   '/portal/availability': typeof PortalAvailabilityRoute
   '/portal/documents': typeof PortalDocumentsRoute
+  '/portal/profile': typeof PortalProfileRoute
   '/pros/$id': typeof ProsIdRoute
   '/portal': typeof PortalIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/join': typeof JoinRoute
   '/login': typeof LoginRoute
   '/portal': typeof PortalRouteWithChildren
@@ -113,6 +130,7 @@ export interface FileRoutesById {
   '/confirmation/$code': typeof ConfirmationCodeRoute
   '/portal/availability': typeof PortalAvailabilityRoute
   '/portal/documents': typeof PortalDocumentsRoute
+  '/portal/profile': typeof PortalProfileRoute
   '/pros/$id': typeof ProsIdRoute
   '/portal/': typeof PortalIndexRoute
 }
@@ -120,6 +138,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/join'
     | '/login'
     | '/portal'
@@ -128,11 +147,13 @@ export interface FileRouteTypes {
     | '/confirmation/$code'
     | '/portal/availability'
     | '/portal/documents'
+    | '/portal/profile'
     | '/pros/$id'
     | '/portal/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/join'
     | '/login'
     | '/search'
@@ -140,11 +161,13 @@ export interface FileRouteTypes {
     | '/confirmation/$code'
     | '/portal/availability'
     | '/portal/documents'
+    | '/portal/profile'
     | '/pros/$id'
     | '/portal'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/join'
     | '/login'
     | '/portal'
@@ -153,12 +176,14 @@ export interface FileRouteTypes {
     | '/confirmation/$code'
     | '/portal/availability'
     | '/portal/documents'
+    | '/portal/profile'
     | '/pros/$id'
     | '/portal/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   JoinRoute: typeof JoinRoute
   LoginRoute: typeof LoginRoute
   PortalRoute: typeof PortalRouteWithChildren
@@ -175,6 +200,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/join': {
@@ -240,6 +272,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalDocumentsRouteImport
       parentRoute: typeof PortalRoute
     }
+    '/portal/profile': {
+      id: '/portal/profile'
+      path: '/profile'
+      fullPath: '/portal/profile'
+      preLoaderRoute: typeof PortalProfileRouteImport
+      parentRoute: typeof PortalRoute
+    }
     '/pros/$id': {
       id: '/pros/$id'
       path: '/pros/$id'
@@ -253,12 +292,14 @@ declare module '@tanstack/react-router' {
 interface PortalRouteChildren {
   PortalAvailabilityRoute: typeof PortalAvailabilityRoute
   PortalDocumentsRoute: typeof PortalDocumentsRoute
+  PortalProfileRoute: typeof PortalProfileRoute
   PortalIndexRoute: typeof PortalIndexRoute
 }
 
 const PortalRouteChildren: PortalRouteChildren = {
   PortalAvailabilityRoute: PortalAvailabilityRoute,
   PortalDocumentsRoute: PortalDocumentsRoute,
+  PortalProfileRoute: PortalProfileRoute,
   PortalIndexRoute: PortalIndexRoute,
 }
 
@@ -267,6 +308,7 @@ const PortalRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   JoinRoute: JoinRoute,
   LoginRoute: LoginRoute,
   PortalRoute: PortalRouteWithChildren,

@@ -41,7 +41,7 @@ function Confirmation() {
           </li>
         ))}
       </ol>
-      {b && <p className="mt-4 text-sm text-muted-foreground">{b.date} · <span dir="ltr">{b.start}–{b.end}</span> · {b.location} · ₪{b.total}</p>}
+      {b && <p className="mt-4 text-sm text-muted-foreground">{b.date} · <span className="time-ltr">{b.start}–{b.end}</span> · {b.location} · ₪{b.total}</p>}
       <Link to="/" className="btn-ghost mt-8">חזרה לדף הבית</Link>
     </div>
   );

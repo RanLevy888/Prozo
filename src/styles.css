@@ -137,3 +137,10 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
 }
+
+/* Keep times like 18:00 from flipping in RTL */
+.time-ltr {
+  direction: ltr;
+  unicode-bidi: isolate;
+  font-variant-numeric: tabular-nums;
+}

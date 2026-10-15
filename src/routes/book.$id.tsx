@@ -3,7 +3,8 @@ import { useState } from "react";
 import { Lock, CreditCard, Check } from "lucide-react";
 import { toast } from "sonner";
 import { type Pro, calcPrice, hoursBetween, professionLabel } from "@/lib/data";
-import { useStore, todayStr, nowTimeStr, isPast } from "@/lib/store";
+import { useStore, isPast } from "@/lib/store";
+import { SlotPicker } from "@/components/slots";
 
 type S = { date?: string | undefined; start?: string | undefined; end?: string | undefined };
 const str = (v: unknown) => (v === undefined || v === null || v === "" ? undefined : String(v));
@@ -38,7 +39,7 @@ function BookView({ pro }: { pro: Pro }) {
   const nav = useNavigate();
   const [step, setStep] = useState(0);
   const [f, setF] = useState({
-    location: "", date: s.date ?? "", start: s.start ?? "18:00", end: s.end ?? "23:00",
+    location: "", date: s.date ?? "", start: s.start ?? "", end: s.end ?? "",
     name: "", phone: "", email: "", card: "", exp: "", cvc: "", holder: "",
   });
   const [processing, setProcessing] = useState(false);
@@ -47,7 +48,7 @@ function BookView({ pro }: { pro: Pro }) {
   const price = calcPrice(pro.rate, hours);
 
   const valid = [
-    f.location && f.date && f.start && f.end && !isPast(f.date, f.start) && pro.availableNow,
+    f.location && f.date && f.start && f.end && !isPast(f.date, f.start) && pro.availableNow && pro.verified !== false,
     f.name && f.phone.replace(/\D/g, "").length >= 9 && /\S+@\S+\.\S+/.test(f.email),
     f.card.replace(/\s/g, "").length >= 15 && f.exp.length >= 4 && f.cvc.length >= 3 && f.holder,
   ];
@@ -80,12 +81,9 @@ function BookView({ pro }: { pro: Pro }) {
         <div className="card-surface mt-6 space-y-4 p-6">
           {step === 0 && (<>
             <label className="block text-sm">כתובת העבודה<input className="field mt-1" placeholder="רחוב, מספר, עיר" value={f.location} onChange={set("location")} /></label>
-            <div className="grid gap-4 sm:grid-cols-3">
-              <label className="text-sm">תאריך<input type="date" min={todayStr()} className="field mt-1" value={f.date} onChange={set("date")} /></label>
-              <label className="text-sm">שעת התחלה<input type="time" min={f.date === todayStr() ? nowTimeStr() : undefined} className="field mt-1" value={f.start} onChange={set("start")} /></label>
-              <label className="text-sm">שעת סיום<input type="time" className="field mt-1" value={f.end} onChange={set("end")} /></label>
-            </div>
+            <SlotPicker pro={pro} date={f.date} start={f.start} end={f.end} onChange={(v) => setF((p) => ({ ...p, ...v }))} />
             {isPast(f.date, f.start) && <p className="text-sm text-destructive">התאריך או השעה שבחרתם כבר עברו. בחרו מועד עתידי.</p>}
+            {pro.verified === false && <p className="text-sm text-warning">הפרופיל ממתין לאימות ועדיין לא ניתן להזמין אותו.</p>}
             {!pro.availableNow && <p className="text-sm text-warning">איש המקצוע לא זמין כרגע להזמנות.</p>}
           </>)}
           {step === 1 && (<>
@@ -126,7 +124,7 @@ function BookView({ pro }: { pro: Pro }) {
         </div>
         <dl className="mt-5 space-y-2 border-t pt-4 text-sm">
           <div className="flex justify-between"><dt className="text-muted-foreground">תאריך</dt><dd>{f.date || "—"}</dd></div>
-          <div className="flex justify-between"><dt className="text-muted-foreground">שעות</dt><dd dir="ltr">{f.start}–{f.end}</dd></div>
+          <div className="flex justify-between"><dt className="text-muted-foreground">שעות</dt><dd className="time-ltr">{f.start && f.end ? `${f.start}–${f.end}` : "—"}</dd></div>
           <div className="flex justify-between"><dt className="text-muted-foreground">סכום ביניים ({hours} ש׳ × ₪{pro.rate})</dt><dd>₪{price.subtotal}</dd></div>
           <div className="flex justify-between"><dt className="text-muted-foreground">דמי שירות</dt><dd>₪{price.fee}</dd></div>
           <div className="flex justify-between border-t pt-3 text-lg font-bold"><dt>סה״כ לתשלום</dt><dd>₪{price.total}</dd></div>

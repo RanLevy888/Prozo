@@ -27,9 +27,14 @@ export interface ProAccount {
   rate: number;
   minHours: number;
   radius: number;
-  docs: Record<string, "missing" | "pending" | "approved">;
+  avatar?: string;
+  docs: Record<string, DocStatus>;
   availability: Record<string, boolean>;
+  status?: AccountStatus;
 }
+export type DocStatus = "missing" | "pending" | "approved" | "rejected";
+export type AccountStatus = "incomplete" | "pending_approval" | "approved" | "rejected";
+export const accountStatus = (a: ProAccount): AccountStatus => a.status ?? "incomplete";
 
 interface Store {
   hydrated: boolean;
@@ -39,7 +44,10 @@ interface Store {
   setBookingStatus: (code: string, s: Booking["status"]) => void;
   account: ProAccount | null;
   loggedIn: boolean;
-  register: (a: Omit<ProAccount, "proId" | "docs" | "availability">) => void;
+  register: (a: Omit<ProAccount, "proId" | "docs" | "availability" | "status">) => void;
+  accounts: ProAccount[];
+  /** Admin: approve/reject an account's documents. */
+  reviewAccount: (email: string, approve: boolean) => void;
   login: (email: string, password: string) => boolean;
   logout: () => void;
   updateAccount: (p: Partial<ProAccount>) => void;
@@ -76,7 +84,7 @@ function proFromAccount(a: ProAccount, availableNow: boolean): Pro {
     minHours: a.minHours,
     rating: 0,
     reviewsCount: 0,
-    avatar: `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(a.name)}&backgroundColor=3b5bdb`,
+    avatar: a.avatar || `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(a.name)}&backgroundColor=3b5bdb`,
     bio: BIO_NEW,
     certifications: [],
     gallery: [],
@@ -84,6 +92,8 @@ function proFromAccount(a: ProAccount, availableNow: boolean): Pro {
     years: 0,
     availableNow,
     isNew: true,
+    verified: accountStatus(a) === "approved",
+    availability: a.availability,
   };
 }
 
@@ -111,6 +121,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     addBooking: (b) => setBookings((p) => [b, ...p]),
     setBookingStatus: (code, s) => setBookings((p) => p.map((b) => (b.code === code ? { ...b, status: s } : b))),
     account,
+    accounts,
+    reviewAccount: (email, approve) => setAccounts((all) => all.map((a) => a.email !== email ? a : {
+      ...a,
+      status: approve ? "approved" : "rejected",
+      docs: Object.fromEntries(Object.entries(a.docs).map(([k, v]) => [k, v === "missing" ? v : approve ? "approved" : "rejected"])),
+    })),
     loggedIn: !!account,
     register: (a) => {
       const email = a.email.trim().toLowerCase();
@@ -120,6 +136,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         proId: `new-${Date.now().toString(36)}`,
         docs: { id: "missing", cert: "missing", firstaid: "missing" },
         availability: {},
+        status: "incomplete",
       };
       setAccounts((p) => [...p.filter((x) => x.email !== email), acc]);
       setActiveEmail(email);

@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Wallet, CalendarCheck, Inbox, MapPin, Clock } from "lucide-react";
-import { useStore, type Booking } from "@/lib/store";
+import { useStore, accountStatus, type Booking } from "@/lib/store";
+import { FIXED_FEE } from "@/lib/data";
 
 export const Route = createFileRoute("/portal/")({
   component: Dashboard,
@@ -13,8 +14,8 @@ function Dashboard() {
   const bookings = all.filter((b) => b.proId === account?.proId);
   const pending = bookings.filter((b) => b.status === "pending");
   const upcoming = bookings.filter((b) => b.status === "accepted").sort((a, b) => a.date.localeCompare(b.date));
-  const earnings = upcoming.reduce((s, b) => s + Math.round(b.total / 1.1), 0);
-  const docsOk = account && Object.values(account.docs).every((d) => d === "approved");
+  const earnings = upcoming.reduce((s, b) => s + (b.total - FIXED_FEE), 0);
+  const st = account ? accountStatus(account) : "incomplete";
 
   return (
     <div className="space-y-6">
@@ -26,7 +27,11 @@ function Dashboard() {
           {me?.availableNow ? "זמין עכשיו" : "לא זמין"}
         </button>
       </div>
-      {!docsOk && <div className="rounded-xl border border-warning/40 bg-warning/10 p-4 text-sm text-warning">חלק מהמסמכים עדיין ממתינים לבדיקה. הפרופיל יעלה לאוויר במלואו לאחר אישור כולם.</div>}
+      {st !== "approved" && <div className={`rounded-xl border p-4 text-sm ${st === "rejected" ? "border-destructive/40 bg-destructive/10 text-destructive" : "border-warning/40 bg-warning/10 text-warning"}`}>
+        {st === "incomplete" && "הפרופיל שלכם עדיין לא מאומת. העלו את המסמכים בעמוד \"מסמכים\" כדי שנוכל לאשר אתכם — עד אז לקוחות לא יוכלו להזמין אתכם."}
+        {st === "pending_approval" && "המסמכים שלכם בבדיקה. אחרי האישור תוכלו לקבל הזמנות."}
+        {st === "rejected" && "המסמכים נדחו. העלו מסמכים מעודכנים בעמוד \"מסמכים\"."}
+      </div>}
       <div className="grid gap-4 sm:grid-cols-3">
         {[
           { I: Wallet, l: "סך ההכנסות", v: `₪${earnings.toLocaleString()}` },
@@ -71,11 +76,11 @@ function Row({ b, children }: { b: Booking; children: React.ReactNode }) {
       <div className="flex-1">
         <p className="font-medium">{b.clientName} <span className="text-xs text-muted-foreground">· {b.code}</span></p>
         <p className="mt-1 flex flex-wrap gap-3 text-xs text-muted-foreground">
-          <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{b.date} · <span dir="ltr">{b.start}–{b.end}</span></span>
+          <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{b.date} · <span className="time-ltr">{b.start}–{b.end}</span></span>
           <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{b.location}</span>
         </p>
       </div>
-      <span className="font-semibold">₪{Math.round(b.total / 1.1)}</span>
+      <span className="font-semibold">₪{(b.total - FIXED_FEE)}</span>
       <div className="flex gap-2">{children}</div>
     </div>
   );

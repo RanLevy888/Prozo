@@ -17,14 +17,15 @@ const badge = {
   missing: "bg-secondary text-muted-foreground",
   pending: "bg-warning/15 text-warning",
   approved: "bg-success/15 text-success",
+  rejected: "bg-destructive/15 text-destructive",
 };
-const label = { missing: "לא הועלה", pending: "ממתין לבדיקה", approved: "מאושר" };
+const label = { missing: "לא הועלה", pending: "ממתין לבדיקה", approved: "מאושר", rejected: "נדחה" };
 
 function Documents() {
   const { account, updateAccount } = useStore();
   if (!account) return null;
   const upload = (key: string) => {
-    updateAccount({ docs: { ...account.docs, [key]: "pending" } });
+    updateAccount({ docs: { ...account.docs, [key]: "pending" }, status: "pending_approval" });
     toast.success("הקובץ הועלה. הצוות שלנו יבדוק אותו תוך 24 שעות");
   };
   return (

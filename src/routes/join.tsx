@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { useStore } from "@/lib/store";
+import { AvatarInput, avatarError } from "@/components/avatar-input";
 import { CITIES, PROFESSIONS, type Profession } from "@/lib/data";
 
 export const Route = createFileRoute("/join")({
@@ -16,7 +17,7 @@ export const Route = createFileRoute("/join")({
   component: Join,
 });
 
-type Form = { name: string; phone: string; email: string; password: string; profession: Profession; city: string; rate: number; minHours: number; radius: number };
+type Form = { name: string; phone: string; email: string; password: string; profession: Profession; city: string; rate: number; minHours: number; radius: number; avatar: string };
 type Errors = Partial<Record<keyof Form, string>>;
 
 function validate(f: Form): Errors {
@@ -24,6 +25,9 @@ function validate(f: Form): Errors {
   const name = f.name.trim();
   if (!name) e.name = "יש להזין שם מלא";
   else if (name.length < 2 || name.length > 80) e.name = "השם צריך להכיל בין 2 ל-80 תווים";
+  else if (name.includes("@") || !/\s/.test(name)) e.name = "יש להזין שם פרטי ושם משפחה";
+  const av = avatarError(f.avatar);
+  if (av) e.avatar = av;
   const phone = f.phone.replace(/[\s-]/g, "");
   if (!phone) e.phone = "יש להזין מספר טלפון";
   else if (!/^0\d{8,9}$/.test(phone)) e.phone = "מספר הטלפון אינו תקין (לדוגמה: 050-1234567)";
@@ -51,7 +55,7 @@ function Field({ label, error, className = "", children }: { label: string; erro
 function Join() {
   const { register } = useStore();
   const nav = useNavigate();
-  const [f, setF] = useState<Form>({ name: "", phone: "", email: "", password: "", profession: "lifeguard", city: CITIES[0]!.he, rate: 130, minHours: 4, radius: 25 });
+  const [f, setF] = useState<Form>({ name: "", phone: "", email: "", password: "", profession: "lifeguard", city: CITIES[0]!.he, rate: 130, minHours: 4, radius: 25, avatar: "" });
   const [errors, setErrors] = useState<Errors>({});
   const [tried, setTried] = useState(false);
 
@@ -69,7 +73,7 @@ function Join() {
     setErrors(errs);
     if (Object.keys(errs).length) return;
     register({ ...f, name: f.name.trim(), email: f.email.trim() });
-    toast.success("ברוכים הבאים ל-Prozo! הפרופיל שלכם כבר מופיע בחיפוש.");
+    toast.success("ברוכים הבאים ל-Prozo! העלו מסמכים כדי שנאשר את הפרופיל ותוכלו לקבל הזמנות.");
     nav({ to: "/portal" });
   };
 
@@ -79,6 +83,7 @@ function Join() {
       <p className="mt-2 text-muted-foreground">כבר רשומים? <Link to="/login" className="text-primary">להתחברות</Link></p>
       <form noValidate onSubmit={submit} className="card-surface mt-8 grid gap-4 p-6 sm:grid-cols-2">
         <Field label="שם מלא" error={errors.name} className="sm:col-span-2"><input className={cls("name")} maxLength={80} value={f.name} onChange={set("name")} /></Field>
+        <div className="text-sm sm:col-span-2">תמונת פרופיל<div className="mt-2"><AvatarInput value={f.avatar} onChange={(v) => { const n = { ...f, avatar: v }; setF(n); if (tried) setErrors(validate(n)); }} error={errors.avatar} /></div></div>
         <Field label="טלפון נייד" error={errors.phone}><input type="tel" dir="ltr" className={`${cls("phone")} text-end`} placeholder="050-1234567" value={f.phone} onChange={set("phone")} /></Field>
         <Field label="אימייל" error={errors.email}><input type="email" dir="ltr" className={`${cls("email")} text-end`} maxLength={255} value={f.email} onChange={set("email")} /></Field>
         <Field label="סיסמה" error={errors.password} className="sm:col-span-2"><input type="password" className={cls("password")} value={f.password} onChange={set("password")} /></Field>

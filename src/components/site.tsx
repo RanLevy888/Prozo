@@ -38,6 +38,7 @@ export function Footer() {
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-muted-foreground sm:flex-row">
         <Logo />
         <p>© 2026 Prozo. אנשי מקצוע מאומתים לכל עבודה, לפי דרישה.</p>
+        <Link to="/admin" className="text-xs hover:text-foreground">ניהול</Link>
       </div>
     </footer>
   );
@@ -60,7 +61,9 @@ export function ProCard({ pro }: { pro: Pro }) {
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
             <h3 className="truncate font-semibold">{pro.name}</h3>
-            <BadgeCheck className="h-4 w-4 shrink-0 text-primary" aria-label="מאומת" />
+            {pro.verified === false
+              ? <span className="shrink-0 rounded-full bg-warning/15 px-2 py-0.5 text-[10px] text-warning">ממתין לאימות</span>
+              : <BadgeCheck className="h-4 w-4 shrink-0 text-primary" aria-label="מאומת" />}
           </div>
           <span className={`ms-2 inline-flex items-center gap-1 text-[11px] ${pro.availableNow ? "text-success" : "text-muted-foreground"}`}><span className={`h-1.5 w-1.5 rounded-full ${pro.availableNow ? "bg-success" : "bg-muted-foreground"}`} />{pro.availableNow ? "זמין עכשיו" : "לא זמין"}</span>
           <span className="mt-1 inline-block rounded-full bg-accent px-2.5 py-0.5 text-xs text-accent-foreground">{professionLabel(pro.profession)}</span>

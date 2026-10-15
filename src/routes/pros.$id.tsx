@@ -3,7 +3,8 @@ import { useState } from "react";
 import { BadgeCheck, Award, MapPin, Clock, ShieldCheck } from "lucide-react";
 import { PROS, calcPrice, professionLabel, hoursBetween } from "@/lib/data";
 import { Stars } from "@/components/site";
-import { useStore, todayStr, isPast } from "@/lib/store";
+import { SlotPicker } from "@/components/slots";
+import { useStore, isPast } from "@/lib/store";
 
 export const Route = createFileRoute("/pros/$id")({
   loader: ({ params }) => {
@@ -38,8 +39,9 @@ function ProPage() {
 function ProView({ pro }: { pro: import("@/lib/data").Pro }) {
   const nav = useNavigate();
   const [date, setDate] = useState("");
-  const [start, setStart] = useState("18:00");
-  const [end, setEnd] = useState("23:00");
+  const [start, setStart] = useState("");
+  const [end, setEnd] = useState("");
+  const bookable = pro.availableNow && pro.verified !== false;
   const hours = Math.max(pro.minHours, hoursBetween(start, end));
   const price = calcPrice(pro.rate, hours);
 
@@ -51,7 +53,7 @@ function ProView({ pro }: { pro: import("@/lib/data").Pro }) {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-3xl font-bold">{pro.name}</h1>
-              <BadgeCheck className="h-6 w-6 text-primary" aria-label="מאומת" />
+              {pro.verified === false ? <span className="rounded-full bg-warning/15 px-2 py-0.5 text-xs text-warning">ממתין לאימות</span> : <BadgeCheck className="h-6 w-6 text-primary" aria-label="מאומת" />}
             </div>
             <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
               <span className="rounded-full bg-accent px-3 py-1">{professionLabel(pro.profession)}</span>
@@ -104,21 +106,19 @@ function ProView({ pro }: { pro: import("@/lib/data").Pro }) {
         <div className="card-surface p-6 shadow-glow">
           <p className="text-2xl font-bold">₪{pro.rate}<span className="text-sm font-normal text-muted-foreground"> / לשעה</span></p>
           <p className="text-xs text-muted-foreground">מינימום {pro.minHours} שעות</p>
-          <div className="mt-5 space-y-3">
-            <label className="block text-xs text-muted-foreground">תאריך<input type="date" min={todayStr()} className="field mt-1" value={date} onChange={(e) => setDate(e.target.value)} /></label>
-            <div className="grid grid-cols-2 gap-3">
-              <label className="text-xs text-muted-foreground">שעת התחלה<input type="time" className="field mt-1" value={start} onChange={(e) => setStart(e.target.value)} /></label>
-              <label className="text-xs text-muted-foreground">שעת סיום<input type="time" className="field mt-1" value={end} onChange={(e) => setEnd(e.target.value)} /></label>
-            </div>
+          <div className="mt-5">
+            <SlotPicker pro={pro} date={date} start={start} end={end} labelClass="text-xs text-muted-foreground"
+              onChange={(v) => { setDate(v.date); setStart(v.start); setEnd(v.end); }} />
           </div>
           <dl className="mt-5 space-y-2 border-t pt-4 text-sm">
             <div className="flex justify-between"><dt className="text-muted-foreground">₪{pro.rate} × {hours} שעות</dt><dd>₪{price.subtotal}</dd></div>
-            <div className="flex justify-between"><dt className="text-muted-foreground">דמי שירות (10%)</dt><dd>₪{price.fee}</dd></div>
+            <div className="flex justify-between"><dt className="text-muted-foreground">דמי שירות</dt><dd>₪{price.fee}</dd></div>
             <div className="flex justify-between text-base font-bold"><dt>סה״כ</dt><dd>₪{price.total}</dd></div>
           </dl>
           {isPast(date, start) && <p className="mt-3 text-xs text-destructive">לא ניתן לבחור תאריך או שעה שכבר עברו.</p>}
-          {!pro.availableNow && <p className="mt-3 text-xs text-warning">איש המקצוע לא זמין כרגע להזמנות.</p>}
-          <button className="btn-primary mt-5 w-full" disabled={!pro.availableNow || isPast(date, start)} onClick={() => nav({ to: "/book/$id", params: { id: pro.id }, search: { date: date || undefined, start, end } })}>להזמנה</button>
+          {pro.verified === false && <p className="mt-3 text-xs text-warning">הפרופיל ממתין לאימות מסמכים ועדיין לא ניתן להזמין אותו.</p>}
+          {pro.verified !== false && !pro.availableNow && <p className="mt-3 text-xs text-warning">איש המקצוע לא זמין כרגע להזמנות.</p>}
+          <button className="btn-primary mt-5 w-full" disabled={!bookable || !date || !start || !end || isPast(date, start)} onClick={() => nav({ to: "/book/$id", params: { id: pro.id }, search: { date: date || undefined, start, end } })}>להזמנה</button>
           <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted-foreground"><ShieldCheck className="h-3.5 w-3.5" />ללא צורך בחשבון · התשלום מוחזק בנאמנות</p>
         </div>
       </aside>
